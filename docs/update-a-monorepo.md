@@ -17,7 +17,7 @@ How a monorepo that was created from the boilerplate gets what the boilerplate c
 ## What you need
 
 - Node 24 or newer, and git.
-- Access to `Toraline/monorepo-boilerplate` with your git login. Check it: `git ls-remote https://github.com/Toraline/monorepo-boilerplate.git`. If it asks for a login: `gh auth login`, then `gh auth setup-git`.
+- The network. The boilerplate, `Toraline/monorepo-boilerplate`, is public: git reads it with no login. Check it: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git` prints one line per release.
 - A working tree with nothing uncommitted: `git status` prints `nothing to commit, working tree clean`.
 
 ## The steps
@@ -139,7 +139,7 @@ Each message has two lines: `Stopped:` says what is wrong, `What to do:` says th
 |---|---|
 | `has no record file (.toraline-monorepo.json)` | The repository was started before the record file existed. Run `npx update-toraline-monorepo --init-record <version>` with the version of the boilerplate it was started from, commit the new file, and start again |
 | `The working tree has ... not committed` | Commit the changes, or put them away with `git stash --include-untracked` |
-| `The boilerplate could not be read` | Check your git login: `gh auth login`, then `gh auth setup-git` |
+| `The boilerplate could not be read` | Check the network: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git` must print one line per release. With no network, give a local copy of the boilerplate: `--source <folder>` |
 | `The branch "boilerplate-update-..." already exists` | An earlier run created it. Finish that update, or give another name with `--branch` |
 
 ## What stays in your repository after the command
@@ -151,5 +151,5 @@ Each message has two lines: `Stopped:` says what is wrong, `What to do:` says th
 ## Status
 
 - **Done:** the command and the skill. Both were run once against a throwaway monorepo that was one release behind (see `docs/decisions.md` of the boilerplate).
-- **Not done:** the command was not run against the real boilerplate on GitHub: no release exists yet. In the run, no ticket was created and no pull request was opened.
+- **Not done:** the command was not run against the real boilerplate on GitHub. The run above was made before the first release (`0.1.0`, 2026-11-16), with a local copy as the source. In the run, no ticket was created and no pull request was opened.
 - **What you must do:** steps 1 to 5 above, after each release of the boilerplate.

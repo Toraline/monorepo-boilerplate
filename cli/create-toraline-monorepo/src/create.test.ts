@@ -17,12 +17,24 @@ import {
   templateRepositoryOfThisCheckout,
   writeFiles,
 } from "../../shared/src/testing";
+import { parseReleaseUpdates } from "../../shared/src/updates";
+import { sortVersions } from "../../shared/src/versions";
 import { createMonorepo, nextSteps } from "./create";
 import { type CreateManifest, MANIFEST_FILE } from "./manifest";
 import type { CreateOptions } from "./options";
 
 const version = readFileSync(join(BOILERPLATE_ROOT, "boilerplate", "VERSION"), "utf8").trim();
 const manifest = JSON.parse(readFileSync(join(BOILERPLATE_ROOT, MANIFEST_FILE), "utf8")) as CreateManifest;
+
+/** The ids of every update of every updates file of this checkout, oldest release first. */
+const updatesFolder = join(BOILERPLATE_ROOT, "boilerplate", "updates");
+const updateIdsOfTheBoilerplate = sortVersions(
+  readdirSync(updatesFolder).map((fileName) => fileName.replace(/\.json$/, "")),
+).flatMap((releaseVersion) =>
+  parseReleaseUpdates(readFileSync(join(updatesFolder, `${releaseVersion}.json`), "utf8"), releaseVersion).updates.map(
+    (update) => update.id,
+  ),
+);
 
 let templateRepository: string;
 
@@ -76,13 +88,18 @@ function brokenImports(directory: string): string[] {
   return broken;
 }
 
-/** The links of the documents (README.md, AGENTS.md, docs/) that name a file which does not exist. */
+/**
+ * The documents of a monorepo: every Markdown file that is not part of the core. The core (agent/, and the
+ * links .claude/skills and .cursor/skills to it) is the same in every project.
+ */
+function documentsOf(directory: string): string[] {
+  return filesUnder(directory).filter((file) => file.endsWith(".md") && !/^(agent|\.claude|\.cursor)\//.test(file));
+}
+
+/** The links of the documents that name a file which does not exist. */
 function brokenLinks(directory: string): string[] {
   const broken: string[] = [];
-  for (const file of filesUnder(directory)) {
-    if (!/^(README\.md|AGENTS\.md|docs\/.*\.md)$/.test(file)) {
-      continue;
-    }
+  for (const file of documentsOf(directory)) {
     for (const match of textOf(directory, file).matchAll(/\]\(([^)#\s]+)(#[^)]*)?\)/g)) {
       const target = match[1] ?? "";
       if (!/^[a-z]+:/.test(target) && !existsSync(join(directory, dirname(file), target))) {
@@ -150,14 +167,24 @@ describe("createMonorepo, from this checkout as the boilerplate", () => {
       boilerplate: "Toraline/monorepo-boilerplate",
       createdFromVersion: version,
       createdOn: todayAsText(),
-      appliedUpdates: [`${version}-first-release`],
+      appliedUpdates: updateIdsOfTheBoilerplate,
     });
+    // The first id is the first release, the last one is an update of this version.
+    expect(updateIdsOfTheBoilerplate[0]).toBe("0.1.0-first-release");
+    expect(updateIdsOfTheBoilerplate.at(-1)?.startsWith(`${version}-`)).toBe(true);
     expect(git(directory, "ls-files", RECORD_FILE_NAME).trim()).toBe(RECORD_FILE_NAME);
 
     // What belongs only to the boilerplate itself is not there.
     expect(existsSync(join(directory, "cli"))).toBe(false);
     expect(existsSync(join(directory, "boilerplate"))).toBe(false);
     expect(textOf(directory, "Makefile")).not.toContain("cli");
+
+    // The license of the boilerplate is not copied: the new project chooses its own.
+    expect(existsSync(join(directory, "LICENSE"))).toBe(false);
+    expect(JSON.parse(textOf(directory, "package.json")).license).toBeUndefined();
+    expect(JSON.parse(textOf(directory, "package-lock.json")).packages[""].license).toBeUndefined();
+    expect(textOf(directory, "README.md")).not.toMatch(/license/i);
+    expect(nextSteps(optionsFor(directory), result, false).join("\n")).toContain("Choose the license of your project.");
 
     for (const removed of manifest.boilerplateOnly.delete ?? []) {
       expect(existsSync(join(directory, removed)), removed).toBe(false);
@@ -214,20 +241,94 @@ describe("createMonorepo, from this checkout as the boilerplate", () => {
 
     expect(git(directory, "log", "--format=%s").trim().split("\n")).toHaveLength(1);
     expect(git(directory, "status", "--porcelain")).toBe("");
-    expect(nextSteps(optionsFor(directory, { keepSample: false }), result, false).join("\n")).toContain(
-      "The documents still describe it",
+    expect(brokenLinks(directory)).toEqual([]);
+    // The command leaves no step about the documents to the person.
+    expect(nextSteps(optionsFor(directory, { keepSample: false }), result, false).join("\n")).not.toMatch(
+      /sample product|documents still/,
     );
+  });
+
+  it("creates a monorepo with no sample product, where no document names the sample product", () => {
+    const directory = join(temporaryFolder("create"), "sample-shop");
+
+    createMonorepo(optionsFor(directory, { keepSample: false }), ignoreLine);
+
+    // "Todo" in docs/workflow/status-skills.md is a status of a ticket in Linear, not the sample product.
+    const allowed = /Refined, no spec \(Todo\)/g;
+    const stillNamed = documentsOf(directory).flatMap((file) =>
+      textOf(directory, file)
+        .replace(allowed, "")
+        .split("\n")
+        .filter((line) => /todo|TagBadge|seed-sample|seed_sample/i.test(line))
+        .map((line) => `${file}: ${line.slice(0, 120)}`),
+    );
+
+    expect(
+      stillNamed,
+      `These lines still name the sample product. Add an entry to the group sampleProduct of ${MANIFEST_FILE}, or correct the file in boilerplate/without-sample/.`,
+    ).toEqual([]);
+  });
+
+  it.each([
+    ["with the sample product", true],
+    ["without the sample product", false],
+  ])("writes a README.md and an AGENTS.md for a new project, %s", (_label, keepSample) => {
+    const directory = join(temporaryFolder("create"), "sample-shop");
+
+    createMonorepo(optionsFor(directory, { keepSample }), ignoreLine);
+
+    for (const file of ["README.md", "AGENTS.md"]) {
+      const text = textOf(directory, file);
+      // The place for the 2 sentences of the project, right under the title.
+      expect(text.split("\n")[2], file).toBe("_Write 2 sentences here: what sample-shop is, and who uses it._");
+      // No text that is only about the boilerplate repository itself.
+      expect(text, file).not.toMatch(
+        /The public starting point|generic on purpose|work on the boilerplate itself|Use the core in another project|in other projects|creates your own monorepo|from this repository|this boilerplate|cli\/|boilerplate\/|releasing\.md|repositories\.md/,
+      );
+    }
+    expect(textOf(directory, "README.md")).toContain("make sync-skills");
+    expect(textOf(directory, "README.md").includes("todo list")).toBe(keepSample);
+    // The pictures of the boilerplate and its way to try it are not there.
+    expect(textOf(directory, "README.md")).not.toMatch(/docs\/images|!\[|## Try it|npx create-toraline-monorepo my-project/);
+    expect(textOf(directory, "AGENTS.md").includes("todo list")).toBe(keepSample);
+  });
+
+  it.each([
+    ["with the sample product", true],
+    ["without the sample product", false],
+  ])("does not copy the decisions and the public files of the boilerplate, %s", (_label, keepSample) => {
+    const directory = join(temporaryFolder("create"), "sample-shop");
+
+    createMonorepo(optionsFor(directory, { keepSample }), ignoreLine);
+
+    // The new project starts its own list of decisions.
+    const decisions = textOf(directory, "docs/decisions.md");
+    expect(decisions).toBe(textOf(BOILERPLATE_ROOT, "boilerplate/new-project/docs/decisions.md"));
+    expect(decisions).not.toMatch(/^## \d{4}-\d{2}-\d{2}/m);
+    expect(decisions).not.toMatch(/TOR-\d+/);
+    // The files that say how to report a problem of the boilerplate, its license and its pictures.
+    for (const file of ["LICENSE", "SECURITY.md", "CONTRIBUTING.md", "docs/images"]) {
+      expect(existsSync(join(directory, file)), file).toBe(false);
+    }
+    // No document names them. The guide is the exception: it lists what the command removed.
+    for (const file of documentsOf(directory).filter((name) => name !== "docs/start-a-new-monorepo.md")) {
+      expect(textOf(directory, file), file).not.toMatch(/SECURITY\.md|CONTRIBUTING\.md/);
+    }
   });
 
   it("names the file of each overlay as it is today (a changed file makes the overlay stale)", () => {
     for (const overlay of manifest.sampleProduct.overlays ?? []) {
       const today = createHash("sha256").update(readFileSync(join(BOILERPLATE_ROOT, overlay.file))).digest("hex");
 
+      expect(existsSync(join(BOILERPLATE_ROOT, overlay.from)), overlay.from).toBe(true);
+      // An overlay with no SHA-256 does not follow the content of the file that it replaces.
+      if (overlay.originalSha256 === undefined) {
+        continue;
+      }
       expect(
         today,
-        `${overlay.file} changed. Check that ${overlay.from} still replaces it correctly, then write the new SHA-256 into ${MANIFEST_FILE}.`,
+        `${overlay.file} changed. Make the same change in ${overlay.from} when it applies there, then write the new SHA-256 into ${MANIFEST_FILE}: shasum -a 256 "${overlay.file}"`,
       ).toBe(overlay.originalSha256);
-      expect(existsSync(join(BOILERPLATE_ROOT, overlay.from)), overlay.from).toBe(true);
     }
   });
 
@@ -242,6 +343,32 @@ describe("createMonorepo, from this checkout as the boilerplate", () => {
 });
 
 describe("createMonorepo: the refusals", () => {
+  it("refuses a --source that git would read as an option, and runs no program", () => {
+    const directory = join(temporaryFolder("create"), "sample-shop");
+    const marker = join(temporaryFolder("marker"), "program-ran");
+    const source = `--upload-pack=touch ${marker}`;
+
+    expect(() => createMonorepo({ ...optionsFor(directory), source, reference: "main" }, ignoreLine)).toThrow(
+      'The value of --source starts with "-"',
+    );
+    expect(() => createMonorepo({ ...optionsFor(directory), source, reference: undefined }, ignoreLine)).toThrow(
+      'The value of --source starts with "-"',
+    );
+    expect(existsSync(marker)).toBe(false);
+    expect(existsSync(directory)).toBe(false);
+  });
+
+  it("refuses a --ref that git would read as an option", () => {
+    const directory = join(temporaryFolder("create"), "sample-shop");
+    const marker = join(temporaryFolder("marker"), "program-ran");
+
+    expect(() =>
+      createMonorepo({ ...optionsFor(directory), reference: `--upload-pack=touch ${marker}` }, ignoreLine),
+    ).toThrow('The value of --ref starts with "-"');
+    expect(existsSync(marker)).toBe(false);
+    expect(existsSync(directory)).toBe(false);
+  });
+
   it("refuses a folder that is not empty, and changes nothing in it", () => {
     const directory = temporaryFolder("create");
     writeFiles(directory, { "notes.txt": "mine" });
@@ -295,7 +422,7 @@ describe("createMonorepo: the refusals", () => {
     expect(failure).toBeInstanceOf(CommandError);
     expect(failure.message).toContain("The boilerplate could not be read.");
     expect(failure.message).toContain(missingSource);
-    expect(failure.whatToDo).toContain("gh auth login");
+    expect(failure.whatToDo).toContain("git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git");
     expect(failure.whatToDo).toContain("--source");
     expect(readdirSync(parent)).toEqual([]);
   });

@@ -67,7 +67,7 @@ Run every command from the root folder of the repository. Do the steps in this o
 **Step 1. Clone the repository into your repositories folder and enter it.**
 
 ```bash
-git clone git@github.com:Toraline/monorepo-boilerplate.git
+git clone https://github.com/Toraline/monorepo-boilerplate.git
 ```
 
 ```bash
@@ -237,7 +237,28 @@ One app or package alone: `make test-api`, `make lint-web`, `make run-internal`,
 
 ### The database in a worktree
 
-Each checkout has its own database: its own container, its own data, its own port. The main checkout uses port 5432. When `make worktree` creates a worktree, it writes the first free port from 5433 up into the worktree's `.env` (the variable `POSTGRES_PORT`). You start the worktree's database with `make db-up` inside the worktree.
+Each checkout has its own database: its own container, its own data, its own port. The main checkout uses the port in its own `.env` (5432 in `.env.example`). You start the worktree's database with `make db-up` inside the worktree.
+
+`make worktree` and `make env` run `scripts/worktree-setup.local.sh` in a worktree. The script writes the worktree's port into the line `POSTGRES_PORT` of the worktree's `.env`. The rule:
+
+1. The script counts up from 5433.
+2. It skips the port of the main checkout, the port of every other worktree of this repository, and every port that a program on this machine listens on.
+3. It writes the first port that is left, with a comment line above it: `# The port below was chosen for this worktree by scripts/worktree-setup.local.sh: <port>`.
+4. A second run keeps a port that has this comment line, also while the worktree's own database is running on it.
+5. A port with no such comment line is replaced. So a worktree never keeps the 5432 of `.env.example`, and never the port that it copied from the main checkout.
+
+To choose the port of a worktree yourself: write it into the line `POSTGRES_PORT` and write the same port at the end of the comment line. Without the comment line, the next `make env` replaces your port.
+
+The test `cli/shared/src/worktree-port.test.ts` (part of `make check`) runs the script in a temporary repository for these cases: main checkout on 5432, main checkout on another port, port in use by another program, a second run.
+
+To check by hand, inside a worktree:
+
+```bash
+make env
+grep -n "POSTGRES_PORT" .env
+```
+
+It worked when: the first command prints a line that starts with `Database port:`, and the second prints the comment line and `POSTGRES_PORT=<port>` with the same port, which is not the port of the main checkout.
 
 Before you remove a worktree, delete its database. Run this inside the worktree:
 
@@ -295,10 +316,38 @@ Later, to get a newer core: `make sync-skills` inside the project. It replaces t
 ## 6. Rules about secrets and data
 
 - `.env` and every `.env.*` file are ignored by git. Only `.env.example` is committed. Every value in it is an invented sample that works only on your own machine. A real key goes into `.env` only.
-- A sample value starts with `sample-`. When `DJANGO_DEBUG` is not `True`, the server refuses a `DJANGO_SECRET_KEY` that starts with `sample-`, and `make seed` refuses a `SEED_ADMIN_PASSWORD` that starts with `sample-`. `make seed-sample` does not run at all.
-- The pre-commit hook `scripts/check-secrets.sh` refuses a commit that adds a token, a private key or a connection string with a password.
+- A sample value starts with `sample-`. When `DJANGO_DEBUG` is not `True`, the server refuses a `DJANGO_SECRET_KEY` that starts with `sample-` or has fewer than 50 characters, and a `POSTGRES_PASSWORD` that starts with `sample-`. `make seed` refuses a `SEED_ADMIN_PASSWORD` that starts with `sample-`. `make seed-sample` does not run at all.
+- The pre-commit hook `scripts/check-secrets.sh` refuses a commit that adds a token, a private key or a connection string with a password. It also refuses a line of the form `NAME=value` whose name holds `PASSWORD`, `SECRET`, `TOKEN`, `API_KEY` or `PRIVATE_KEY`, unless the value starts with `sample-` or is a placeholder. It refuses an env file in every folder, for example `apps/api/.env`. It reads binary files and renamed files too. It also refuses a private name: see "Private names" below.
+- The hook runs only after `make hooks` (`make setup` runs it), and `git commit --no-verify` skips it. So the automatic check on GitHub runs the same script for everything that a pull request changes.
+- The script knows the form of the tokens of some services (GitHub, npm, Stripe, AWS, Google, Slack, Notion, Linear, Figma, OpenAI). A secret in another form passes. Turn on secret scanning in the settings of the repository on GitHub as a second check.
 - Examples and seed data in this repository are invented. Never copy real customer, financial or personal data into it.
 - `local-docs/` is ignored by git. Private notes go there.
+
+### Private names
+
+A private name is a name that must never be in this repository: the name of a private repository, of a customer, of a product that is not public, or of a person. The pre-commit hook refuses a commit that adds one. The names are not written in a committed file, because that would publish them. You keep them in a file that git ignores.
+
+1. Create the file `local-docs/private-names.txt` in the main checkout. `make setup` created the folder `local-docs/`. Worktrees read the same file.
+2. Write one name per line. A line that starts with `#` is a comment. Example, with invented names:
+
+   ```
+   # Private repositories
+   invented-private-shop
+   # Customers
+   Sample Customer Ltd
+   ```
+
+3. Upper and lower case count as the same letter. A name also matches inside a longer word, so do not write a common word.
+
+When a commit adds a name of the file, to the text of a file or to its path, the commit stops with the line `Refused: <file> adds a private name, or has one in its path.` The hook does not print the name. Replace the name with a neutral phrase, for example "an earlier private project", and commit again.
+
+Without the file the hook checks only the secrets. To search every committed file for the names, for example before you make a repository public:
+
+```bash
+git grep -n -i -F -f local-docs/private-names.txt
+```
+
+It worked when: the command prints nothing.
 
 ## 7. How the pieces fit
 
@@ -310,5 +359,5 @@ Later, to get a newer core: `make sync-skills` inside the project. It replaces t
 ## Status
 
 - **Done:** the scripts, the rules, the templates, the profile, the skills; the folders `apps/` and `packages/`, the npm workspace, the database in Docker, the commands `setup`, `run`, `lint`, `test` and `check`, the automatic check on GitHub; the server `apps/api` with its settings, its health request, the table of the users, login, logout, "who am I", the Django admin and the seed of the first admin; the todo list in the server: todos, tags, the history of the changes, the requests for an admin, and the optional seed of sample data; the web app `apps/web` (login, the todo list of a user, tags, filters) and the internal app `apps/internal` (login for admins only, the tags, the todos of all users, the history), in English and Portuguese (Brazil) with a language switch, and the packages `packages/shared` and `packages/ui` with the code that both apps share; the catalog of the components `apps/ui-catalog`; the 2 end-to-end tests and `make e2e`; the guide [start-a-new-monorepo.md](start-a-new-monorepo.md).
-- **Not done:** a deploy guide; a command that starts a new monorepo for you.
+- **Not done:** a deploy guide.
 - **What you must do:** sections 2 to 4 above.

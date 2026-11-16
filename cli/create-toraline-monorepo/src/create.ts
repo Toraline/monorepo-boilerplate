@@ -2,7 +2,7 @@ import { copyFileSync, existsSync, readFileSync, readdirSync, rmSync, statSync, 
 import { dirname, join } from "node:path";
 
 import { CommandError } from "../../shared/src/errors";
-import { gitOutput, lastLine, runGit } from "../../shared/src/git";
+import { gitOutput, lastLine, refuseOptionValue, runGit } from "../../shared/src/git";
 import { BOILERPLATE_NAME, RECORD_FILE_NAME, todayAsText, writeRecord } from "../../shared/src/record";
 import { findReachableSource, SOURCE_HELP, sourcesToTry } from "../../shared/src/source";
 import { parseReleaseUpdates, UPDATES_FOLDER, VERSION_FILE } from "../../shared/src/updates";
@@ -59,6 +59,7 @@ interface ChosenTemplate {
 function chooseTemplate(options: CreateOptions): ChosenTemplate {
   const candidates = sourcesToTry(options.source);
   if (options.reference !== undefined) {
+    refuseOptionValue("--ref", options.reference);
     return { sources: candidates, reference: options.reference };
   }
   const reachable = findReachableSource(candidates);
@@ -79,7 +80,10 @@ function copyTemplate(template: ChosenTemplate, directory: string): string {
   for (const source of template.sources) {
     // A folder of this machine is copied whole; "--depth" is for a git address only.
     const depth = existsSync(source) ? [] : ["--depth", "1"];
-    const result = runGit(["clone", "--quiet", ...depth, "--branch", template.reference, source, directory]);
+    refuseOptionValue("the source", source);
+    refuseOptionValue("the tag or branch", template.reference);
+    // "--": what follows is the address and the folder, never an option of git.
+    const result = runGit(["clone", "--quiet", ...depth, "--branch", template.reference, "--", source, directory]);
     if (result.status === 0) {
       return source;
     }
@@ -236,7 +240,8 @@ export function nextSteps(options: CreateOptions, result: CreateResult, defaulte
     "Run the checks: make check   (the last line must be: Check passed.)",
     `Create the repository on GitHub yourself, when you want it: gh repo create ${options.owner}/${options.name} --private --source . --remote origin --push`,
     `In Linear: check that the team with the key ${options.ticketPrefix} exists, and create a project for this repository. The command created nothing in Linear.`,
-    "Change the theme, and write 2 sentences about your project at the top of README.md and AGENTS.md: steps 2 and 8 of docs/start-a-new-monorepo.md.",
+    'Change the theme, and write 2 sentences about your project in README.md and AGENTS.md, in the place of the line "Write 2 sentences here": steps 2 and 8 of docs/start-a-new-monorepo.md.',
+    'Choose the license of your project. The new folder has no file LICENSE: the license of the boilerplate is not copied. When you want one, add a file LICENSE and the line "license" to package.json.',
   ];
   if (defaultedTicketPrefix) {
     steps.push(
@@ -246,11 +251,6 @@ export function nextSteps(options: CreateOptions, result: CreateResult, defaulte
   if (options.databasePort === undefined) {
     steps.push(
       "If another PostgreSQL uses port 5432 on this machine: change the line POSTGRES_PORT in .env before make setup.",
-    );
-  }
-  if (result.sampleRemoved) {
-    steps.push(
-      'The code of the sample product is removed. The documents still describe it: do point 12 of "Remove it" in step 9 of docs/start-a-new-monorepo.md.',
     );
   }
   steps.push("In Claude Code or Cursor, open the folder and type: /start");

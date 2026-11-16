@@ -30,6 +30,7 @@
       "emailRequired": "Type your email.",
       "passwordRequired": "Type your password.",
       "wrongCredentials": "The email or the password is not correct.",
+      "tooManyAttempts": "Too many login attempts. Try again later.",
       "serverError": "The server did not answer. Try again."
     },
     "session": {

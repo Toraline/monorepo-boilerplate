@@ -1,8 +1,9 @@
 {
   "name": "create-toraline-monorepo",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Creates a new monorepo from the Toraline monorepo boilerplate: npx create-toraline-monorepo",
   "author": "Toraline",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Toraline/monorepo-boilerplate.git",

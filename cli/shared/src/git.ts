@@ -12,6 +12,20 @@ export interface GitResult {
 // runs with no person (an agent, a test) would wait for ever.
 const GIT_ENVIRONMENT = { GIT_TERMINAL_PROMPT: "0" };
 
+/**
+ * Stops when a value that the command gives to git starts with "-". git reads
+ * such a value as one of its options, for example "--upload-pack=<program>",
+ * and not as an address, a tag or a branch.
+ */
+export function refuseOptionValue(flag: string, value: string): void {
+  if (value.startsWith("-")) {
+    throw new CommandError(
+      `The value of ${flag} starts with "-": ${value}`,
+      `git would read it as an option. Give ${flag} a value that does not start with "-". A folder whose name starts with "-": write it as ./<name>.`,
+    );
+  }
+}
+
 /** Runs git and returns its exit code and its output. It never throws on a failed git command. */
 export function runGit(gitArguments: string[], workingDirectory?: string): GitResult {
   const result = spawnSync("git", gitArguments, {

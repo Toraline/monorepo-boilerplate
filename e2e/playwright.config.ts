@@ -69,6 +69,9 @@ export default defineConfig({
       env: {
         POSTGRES_DB: e2eDatabaseName,
         WEB_ORIGINS: webUrl,
+        // Every test logs in from the same address. The limit of a real
+        // server (10 login attempts in one minute) would stop a longer run.
+        LOGIN_THROTTLE_RATE: "1000/minute",
         PYTHONUNBUFFERED: "1",
       },
     },

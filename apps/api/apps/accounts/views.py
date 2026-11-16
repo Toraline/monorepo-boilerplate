@@ -1,10 +1,11 @@
 from django.middleware.csrf import get_token
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.permissions import AllowAny, IsAdminUser
 from rest_framework.response import Response
 
 from apps.core.pagination import paged_response
+from apps.core.throttling import LoginRateThrottle
 
 from . import selectors, services
 from .serializers import LoginSerializer, UserSerializer, UserSummarySerializer
@@ -23,7 +24,9 @@ def csrf(request):
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
+@throttle_classes([LoginRateThrottle])
 def login(request):
+    """Logs in. Above the limit on login attempts (LOGIN_THROTTLE_RATE) the answer is 429."""
     serializer = LoginSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     user = services.log_in(request, **serializer.validated_data)

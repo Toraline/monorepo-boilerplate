@@ -1,0 +1,19 @@
+# The indentation and the line ends of each kind of file. Most editors read
+# this file by themselves: https://editorconfig.org
+# ESLint (JavaScript, TypeScript) and ruff (Python) check the code style; this
+# file only makes an editor start with the same basics.
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+
+[*.py]
+indent_size = 4
+
+# make needs a tab at the start of a command line.
+[{Makefile,*.mk}]
+indent_style = tab

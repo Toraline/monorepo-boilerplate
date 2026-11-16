@@ -112,19 +112,24 @@ To add or update a package: change its line in `requirements.txt` (or `requireme
 
 | Variable | Sample value in `.env.example` | Meaning | When it is missing |
 |---|---|---|---|
-| `DJANGO_SECRET_KEY` | An invented sample | The key that Django signs cookies with | The server does not start and names the variable |
+| `DJANGO_SECRET_KEY` | An invented sample | The key that Django signs cookies with. Outside local mode: 50 characters or more, 5 different characters or more, and not the sample | The server does not start and names the variable |
 | `DJANGO_DEBUG` | `True` | `True` turns local mode on | Local mode is off |
 | `DJANGO_ALLOWED_HOSTS` | `localhost,127.0.0.1` | The host names that the server answers to | `localhost,127.0.0.1` |
 | `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_HOST`, `POSTGRES_PORT` | The values of the database in Docker | Where the database is | The server does not start and names the variable |
-
 | `WEB_ORIGINS` | `http://localhost:3000,http://localhost:3001` | The origins of the web apps that may call the server from a browser, separated by commas. Used for CORS and for CSRF | No web app may call the server from a browser |
 | `COOKIE_SECURE` | Not set | `True`: the browser sends the cookies only over https | `False` in local mode, `True` otherwise |
 | `COOKIE_SAMESITE` | Not set | `Lax`, `Strict` or `None`. See "Login and cookies" | `Lax` |
 | `SESSION_COOKIE_AGE` | Not set | How long a login lasts, in seconds | `1209600` (14 days) |
+| `LOGIN_THROTTLE_RATE` | Not set | The limit on login attempts from one network address: a number, a slash, and one of `second`, `minute`, `hour`, `day`. See "The limit on login attempts" | `10/minute` |
+| `NUM_PROXIES` | Not set | How many proxies or load balancers are in front of the server. The limit on login attempts needs it to find the address of the person | `0` |
+| `SECURE_SSL_REDIRECT` | Not set | `True`: a request over http is sent to the same address with https | `False` in local mode, `True` otherwise |
+| `SECURE_HSTS_SECONDS` | Not set | For how many seconds a browser uses only https for the host (the header `Strict-Transport-Security`). `0` sends no header | `0` in local mode, `31536000` (1 year) otherwise |
+| `SECURE_HSTS_INCLUDE_SUBDOMAINS` | Not set | `True`: the header also covers every subdomain of the host | `False` |
+| `TRUST_PROXY_HTTPS_HEADER` | Not set | `True`: the server reads the header `X-Forwarded-Proto` of a proxy to know that the person used https. See "On a real server" | `False` |
 | `SEED_ADMIN_EMAIL`, `SEED_ADMIN_PASSWORD`, `SEED_ADMIN_NAME` | `admin@example.com`, an invented sample password, `Sample Admin` | The first admin that `make seed` creates | `make seed` stops and names the variables. The server itself does not need them |
 | `SEED_SAMPLE_PASSWORD` | An invented sample password | The password of the 2 sample users that `make seed-sample` creates | `make seed-sample` stops and names the variable. The server itself does not need it |
 
-A sample value starts with `sample-`. When local mode is off, the server refuses to start with a `DJANGO_SECRET_KEY` that starts with `sample-`, and `make seed` refuses a `SEED_ADMIN_PASSWORD` that starts with `sample-`. `make seed-sample` does not run at all when local mode is off.
+A sample value starts with `sample-`. When local mode is off, the server refuses to start with a `DJANGO_SECRET_KEY` that starts with `sample-` or that has fewer than 50 characters, and with a `POSTGRES_PASSWORD` that starts with `sample-` (`config/startup.py`). `make seed` refuses a `SEED_ADMIN_PASSWORD` that starts with `sample-`. `make seed-sample` does not run at all when local mode is off.
 
 ## Users and the Django admin
 
@@ -203,6 +208,7 @@ What the status of an answer means:
 |---|---|
 | `401` | Nobody is logged in, or the email or the password of a login is not correct |
 | `403` | The CSRF token is missing or wrong, or the user is logged in and may not do this |
+| `429` | Too many login attempts came from this network address. See "The limit on login attempts" |
 
 Every request needs a login unless its view says otherwise (`DEFAULT_PERMISSION_CLASSES` in `config/settings.py`). A view for everybody has `@permission_classes([AllowAny])`. A view for admins only has `@permission_classes([IsAdminUser])`: an admin is a user with `is_staff` on. A view that every logged-in user may read and only an admin may change has `@permission_classes([IsAdminOrReadOnly])` (`apps/core/permissions.py`).
 
@@ -212,6 +218,23 @@ The two cookies:
 |---|---|---|---|
 | `sessionid` | The key of the session. It is the login | No (`HttpOnly`) | 14 days (`SESSION_COOKIE_AGE`) |
 | `csrftoken` | The secret that the CSRF token is made from | Yes | 1 year |
+
+### The limit on login attempts
+
+The server counts the login attempts of each network address (IP). The 11th attempt in one minute gets the status `429` and the header `Retry-After` with the seconds to wait. A right password is refused too while the address is above the limit.
+
+| What | Value |
+|---|---|
+| What is counted | Each `POST /api/auth/login/` and each sent form of the login page of the Django admin, `/admin/login/`. Both share one count |
+| The limit | `10/minute`. Another limit: the variable `LOGIN_THROTTLE_RATE`, for example `5/minute` or `100/hour` |
+| The code | `LoginRateThrottle` and `admin_login` in `apps/core/throttling.py` |
+| The tests | `apps/core/tests/test_throttling.py`. The other tests run with a limit that they never reach (`config/test_runner.py`), and `make e2e` sets `1000/minute` for its own server |
+
+Three limits of this limit:
+
+1. The count is per network address. An attacker who uses many addresses gets 10 attempts per minute from each. There is no count per email, because that would let anyone lock a user out by sending wrong passwords for that email.
+2. The counts are kept in the memory of the server process (the default cache of Django). A real server that runs more than one process has one count per process. To share the count, set `CACHES` in `config/settings.py` to a cache that all processes use, for example Redis.
+3. Behind a proxy or a load balancer, every request reaches the server from the address of the proxy. Set `NUM_PROXIES` to the number of proxies in front of the server (most often `1`), so the server takes the address of the person from the header `X-Forwarded-For`. With the default `0`, the server ignores that header, because any caller can write it.
 
 ### On a local machine
 
@@ -231,7 +254,10 @@ Version 1 of this project runs only on a local machine. The settings are already
 - `WEB_ORIGINS` holds the `https` origins of the web apps, for example `https://app.example.com,https://internal.example.com`.
 - When the web apps and the server are subdomains of one domain (for example `app.example.com` and `api.example.com`), they are the same site and `SameSite=Lax` works. This is the layout to prefer.
 - When they are on different domains, set `COOKIE_SAMESITE=None`. The server refuses `None` without `Secure`. Some browsers block such cookies.
-- Not done yet: when a proxy receives the `https` requests and passes them to Django over `http`, Django needs the setting `SECURE_PROXY_SSL_HEADER`. The milestone that puts the server on a host adds it.
+- Without `DJANGO_DEBUG=True`, a request over `http` is answered with a redirect to `https` (`SECURE_SSL_REDIRECT`), and each answer over `https` has the header `Strict-Transport-Security` for 1 year (`SECURE_HSTS_SECONDS`). One address also answers over `http`: `/api/health/`, because a load balancer asks it from inside the network.
+- When a proxy or a load balancer receives the `https` requests and passes them to Django over `http`, set `TRUST_PROXY_HTTPS_HEADER=True` and `NUM_PROXIES=1`. Django then reads the header `X-Forwarded-Proto` to know that the person used `https`. Do this only when the proxy always writes that header itself. Without it, Django answers every request with a redirect to `https`, and the browser reports too many redirects.
+- Without `DJANGO_DEBUG=True`, the server does not start with a `DJANGO_SECRET_KEY` that is the sample or has fewer than 50 characters, or with the sample `POSTGRES_PASSWORD`. Make a key with: `python3 -c "import secrets; print(secrets.token_urlsafe(64))"`.
+- `manage.py check --deploy` then prints 2 warnings, `security.W005` and `security.W021`. Both are choices: `SECURE_HSTS_INCLUDE_SUBDOMAINS=True` covers the subdomains too, and the preload list of the browsers is not used.
 
 ## Requests
 
@@ -341,6 +367,7 @@ Logs a user in with an email and a password.
 - Returns, when the email and the password are correct: status `200`, the user in the body, and the cookie `sessionid`.
 - Returns, when the email is unknown, the password is wrong, or the user was turned off: status `401` and `{"detail": "The email or the password is not correct."}`. The answer is the same in the three cases.
 - Returns, when `email` or `password` is missing: status `400` and, for example, `{"password": ["This field is required."]}`.
+- Returns, above the limit on login attempts: status `429`, the header `Retry-After`, and `{"detail": "Request was throttled. Expected available in 42 seconds."}`. The web apps show "Too many login attempts. Try again later."
 
 Replace `PASTE_THE_TOKEN_HERE` with the value of `csrfToken` that the request before returned. The email and the password are the sample values of the first admin in `.env.example`.
 
@@ -455,7 +482,7 @@ curl -b cookies.txt "http://localhost:8000/api/todos/?completed=false&tag=2&page
 
 Creates a todo. Its owner is the user who is logged in. It starts as not completed.
 
-- Needs: a login, the header `X-CSRFToken`, and a JSON body with `title`. `description` is optional. `tagIds` is optional: the list of the ids of the tags of the todo, for example `[2, 5]`. Without it the todo has no tags.
+- Needs: a login, the header `X-CSRFToken`, and a JSON body with `title`. `description` is optional. `tagIds` is optional: the list of the ids of the tags of the todo, for example `[2, 5]`, with 50 ids at most. Without it the todo has no tags.
 - Returns: status `201` and the todo.
 - Returns, when an id of `tagIds` is not the id of a tag: status `400` and `{"tagIds": ["These tag ids do not exist: 999."]}`. Nothing is saved.
 - Returns, when `title` is missing: status `400` and `{"title": ["This field is required."]}`.

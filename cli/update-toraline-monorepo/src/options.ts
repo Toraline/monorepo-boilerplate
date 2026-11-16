@@ -53,7 +53,7 @@ Flags:
   --init-record <version>  For a repository that has no ${RECORD_FILE_NAME}: write that file, as created
                            from this version of the boilerplate (for example 0.1.0). It commits nothing.
   --source <where>         Where to get the boilerplate from: a folder of this machine or a git address.
-                           Default: Toraline/monorepo-boilerplate on GitHub, with your git login.
+                           Default: Toraline/monorepo-boilerplate on GitHub. It is public and needs no login.
                            The environment variable ${SOURCE_ENVIRONMENT_VARIABLE} does the same.
   --version, -v            Print the version of this command.
   --help, -h               Print this text.

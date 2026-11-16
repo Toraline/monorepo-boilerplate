@@ -236,6 +236,16 @@ class TodoTagsTests(TagTestCase):
         self.assertEqual(without_the_field.json()["tags"], [])
         self.assertEqual(with_an_empty_list.json()["tags"], [])
 
+    def test_more_than_50_tag_ids_is_an_error_on_the_field(self):
+        response = self.client.post(
+            TODOS, {"title": "Buy milk", "tagIds": [self.work.pk] * 51}, format="json"
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.json(), {"tagIds": ["Ensure this field has no more than 50 elements."]}
+        )
+
     def test_an_unknown_tag_id_is_an_error_on_the_field(self):
         response = self.client.post(
             TODOS, {"title": "Buy milk", "tagIds": [self.work.pk, 999998, 999999]}, format="json"

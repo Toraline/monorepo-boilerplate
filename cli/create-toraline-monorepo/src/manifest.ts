@@ -27,8 +27,12 @@ export interface JsonChange {
 export interface Overlay {
   file: string;
   from: string;
-  /** The SHA-256 of the file that is replaced, at the time the overlay was written. A test compares it. */
-  originalSha256: string;
+  /**
+   * The SHA-256 of the file that is replaced, at the time the overlay was written. A test compares it,
+   * so a change of the file asks for the same change in the overlay. Left out when the overlay does not
+   * follow the content of the file (docs/decisions.md, which gets a new entry with each ticket).
+   */
+  originalSha256?: string;
 }
 
 /** One group of changes. They run in this order: overlays, delete, replace, json. */
@@ -45,7 +49,7 @@ export interface CreateManifest {
   boilerplateOnly: ManifestSection;
   /** Writes the values of the new project: its name, its ticket prefix, its database name. */
   project: ManifestSection;
-  /** Removes the sample todo product. Runs only when the person chose to remove it. */
+  /** Removes the sample todo product, from the code and from the documents. Runs only when the person chose to remove it. */
   sampleProduct: ManifestSection;
 }
 

@@ -19,14 +19,14 @@ Every flag: `npx create-toraline-monorepo --help`.
 ## What you need
 
 - Node 24 or newer, and git.
-- Access to the repository `Toraline/monorepo-boilerplate` with your git login. The command downloads the boilerplate with `git`, at its newest release tag. The package itself holds no file of the boilerplate.
+- The network. The repository `Toraline/monorepo-boilerplate` is public: git reads it with no login. The command downloads the boilerplate with `git`, at its newest release tag. The package itself holds no file of the boilerplate.
 
 ## What it does
 
 1. Downloads the boilerplate into the new folder. The folder must not exist, or be empty.
-2. Writes the name of the project, the ticket prefix and the name of the database into the files that hold them.
-3. Removes the sample todo product, when you chose that.
-4. Removes the files that belong only to the boilerplate itself.
+2. Writes the name of the project, the ticket prefix and the name of the database into the files that hold them, and a starting text for a new project at the top of `README.md` and `AGENTS.md`.
+3. Removes the sample todo product, when you chose that: its code, its tests, and what the documents say about it.
+4. Removes the files that belong only to the boilerplate itself, also its file `LICENSE`: you choose the license of your project.
 5. Creates `.env` from `.env.example`, and the record file `.toraline-monorepo.json` with the version of the boilerplate.
 6. Starts a new git history with one commit.
 7. Prints the next steps.
@@ -34,3 +34,7 @@ Every flag: `npx create-toraline-monorepo --help`.
 It never creates a repository on GitHub, a project in Linear or an account. It writes only inside the new folder.
 
 The full guide is `docs/start-a-new-monorepo.md` in the new folder.
+
+## License
+
+MIT. The package holds the file `LICENSE`.

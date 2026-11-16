@@ -1,38 +1,46 @@
 # The repositories that use the boilerplate
 
-The list of the repositories that were created from this boilerplate, with the version of the boilerplate that each has. The owner of the boilerplate uses it to know who needs an update after a release.
+This file holds no list. The owner of the boilerplate keeps the list of the repositories that were created from it outside this repository, because this repository is public and some of those repositories are private.
 
 ## Context you need before reading
 
 - **Boilerplate**: this repository, `Toraline/monorepo-boilerplate`.
-- **Version**: the value of `createdFromVersion` in the record file `.toraline-monorepo.json` of a repository ([boilerplate-version.md](boilerplate-version.md)).
-- **Newest update**: the last id of the list `appliedUpdates` of the same file.
+- **Owner**: the person who owns this repository and releases it.
+- **Record file**: the file `.toraline-monorepo.json` in the root folder of a repository that was created from the boilerplate ([boilerplate-version.md](boilerplate-version.md)).
+- **Version**: the value of `createdFromVersion` in the record file.
+- **Newest update**: the last id of the list `appliedUpdates` of the record file.
 
-## The list
+## Why no list is here
 
-| Repository | Created from version | Newest update |
-|---|---|---|
-| (none yet) | | |
+A row of such a list names a repository. The name of a private repository, of a customer or of a product that is not public must not be in a public file. So no name of a repository is written in this file, and none is added later.
 
-No repository is listed today. This repository cannot know of one: no release of the boilerplate exists yet (the first release will be `0.1.0`), so no repository has a record file.
+## Where the list is
 
-## How to add a repository
+The owner keeps it in a private place, for example a private note or a private Linear document. It is not in this repository, also not in a file that git ignores.
 
-1. Open the file `.toraline-monorepo.json` in the root folder of the repository.
-2. Add one row to the table above: the name of the repository as `owner/name`, the value of `createdFromVersion`, and the last id of `appliedUpdates`.
-3. Remove the row "(none yet)" when you add the first repository.
-4. Commit the change through a pull request, as any change of this repository.
+The list has one row per repository, with 3 values:
 
-Write only these 3 values. Write nothing else about a repository here: no address of a server, no name of a customer, no description of its product. This file is public.
+| Value | Where it comes from |
+|---|---|
+| The repository, as `owner/name` | The address of the repository on GitHub |
+| Created from version | `createdFromVersion` of its record file |
+| Newest update | The last id of `appliedUpdates` of its record file |
+
+## How the owner uses the list
+
+1. After a release ([releasing.md](releasing.md)), open the list.
+2. In each repository of the list, run `npx update-toraline-monorepo`, then the skill `/update-boilerplate` ([update-a-monorepo.md](update-a-monorepo.md)).
+3. After the pull request of the update is merged, write the new last id of `appliedUpdates` into the row of that repository.
+4. After `npx create-toraline-monorepo` created a new repository, add its row.
 
 A repository that was started before the record file existed has no `.toraline-monorepo.json`. Create it first: `npx update-toraline-monorepo --init-record <version>` in that repository.
 
-## How to change a row
+## Your own repository
 
-After a repository merged the pull request of an update (`npx update-toraline-monorepo`, then the skill `/update-boilerplate`), write the new last id of its `appliedUpdates` into the column "Newest update".
+You created a monorepo from the boilerplate and you are not the owner: you need no list. Your repository has its record file, and `npx update-toraline-monorepo` reads it.
 
 ## Status
 
-- **Done:** the list and the steps to add a repository.
-- **Not done:** no repository is listed.
-- **What you must do:** add a row for each repository that you create with `npx create-toraline-monorepo`.
+- **Done:** this file says where the list is and what it holds.
+- **Not done:** nothing.
+- **What you must do:** the owner keeps the private list up to date. Nobody adds the name of a repository to this file.

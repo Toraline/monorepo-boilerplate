@@ -34,16 +34,30 @@ jobs:
           --health-timeout 5s
           --health-retries 10
     steps:
-      - uses: actions/checkout@v4
+      # Each action is named by the full id of a commit, not by a tag. A tag
+      # can be moved to other code; a commit id cannot. The comment after the
+      # id is the version. This prints the commit id of a version:
+      #   gh api repos/actions/checkout/git/ref/tags/v4.4.0 --jq .object.sha
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # 2 commits: the merge commit of the pull request, and the commit of
+          # main that it is merged into. The next step compares them.
+          fetch-depth: 2
+
+      # The same check as the pre-commit hook, for everything that the pull
+      # request changes. A commit that was made with "git commit --no-verify",
+      # or on a machine that never ran "make hooks", did not pass the hook.
+      - name: Check the pull request for secrets
+        run: CHECK_SECRETS_BASE=HEAD^1 bash scripts/check-secrets.sh
 
       # "cache: npm" keeps the downloaded packages between runs. The key of the
       # cache is the content of package-lock.json.
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: .nvmrc
           cache: npm
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
         with:
           python-version-file: .python-version
           cache: pip
@@ -93,7 +107,7 @@ jobs:
       # "Artifacts".
       - name: Keep the report of the end-to-end tests
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: e2e-report
           path: |

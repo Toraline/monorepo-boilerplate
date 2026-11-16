@@ -64,9 +64,13 @@ jobs:
             exit 1
           fi
 
-      - uses: actions/checkout@v4
+      # Each action is named by the full id of a commit, not by a tag. A tag
+      # can be moved to other code; a commit id cannot. The comment after the
+      # id is the version. This prints the commit id of a version:
+      #   gh api repos/actions/checkout/git/ref/tags/v4.4.0 --jq .object.sha
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org

@@ -383,6 +383,18 @@ describe("update-toraline-monorepo: applying", () => {
 });
 
 describe("update-toraline-monorepo: the refusals", () => {
+  it("refuses a --source that git would read as an option, and runs no program", async () => {
+    const monorepo = monorepoFromFirstRelease();
+    const marker = join(temporaryFolder("marker"), "program-ran");
+
+    const { exitCode, output } = await runCommand(monorepo, ["--all", `--source=--upload-pack=touch ${marker}`]);
+
+    expect(exitCode).toBe(1);
+    expect(output).toContain('Stopped: The value of --source starts with "-"');
+    expect(existsSync(marker)).toBe(false);
+    expect(git(monorepo, "branch", "--show-current").trim()).toBe("main");
+  });
+
   it("refuses a working tree with changes that are not committed", async () => {
     const monorepo = monorepoFromFirstRelease();
     writeFiles(monorepo, { "agent/CORE_VERSION": "changed and not committed\n" });

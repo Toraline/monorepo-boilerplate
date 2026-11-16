@@ -36,11 +36,11 @@ User interface (components, the theme) does not belong here. It goes into `packa
 import { apiFetch, isApiError } from "@repo/shared/api";
 
 // A request that reads.
-const tags = await apiFetch<unknown>("/api/tags/");
+const notes = await apiFetch<unknown>("/api/notes/");
 
 // A request that changes data. `json` is sent as the JSON body.
 try {
-  await apiFetch<unknown>("/api/todos/", {
+  await apiFetch<unknown>("/api/notes/", {
     method: "POST",
     json: { title: "Buy milk" },
   });

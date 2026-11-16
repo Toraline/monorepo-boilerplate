@@ -27,7 +27,7 @@ Every version in `package.json` is exact. The same versions are in `apps/interna
 | Next.js | 16.4.3 |
 | React | 19.2.4 |
 | Tailwind CSS | 4.3.0 |
-| `@toraline.tech/ui` and `@toraline.tech/tokens` | 0.3.0 |
+| `@toraline.tech/ui` and `@toraline.tech/tokens` | 0.3.1 |
 | TanStack Query | 5.104.5 |
 | next-intl | 4.15.1 |
 | Zod | 4.6.7 |
@@ -59,7 +59,8 @@ To add or update a package: change its line in `apps/web/package.json`, with an 
 ```
 apps/web/
 ├── package.json        the packages and the npm scripts: dev, build, start, lint, typecheck, test
-├── next.config.ts      the settings of Next.js; it loads .env of the root folder
+├── next.config.ts      the settings of Next.js; it loads .env of the root folder and adds the security headers
+├── security-headers.ts the security headers of every answer
 ├── tsconfig.json       the settings of TypeScript; "@/..." in an import means "src/..."
 ├── eslint.config.mjs   the rules of ESLint
 ├── postcss.config.mjs  turns Tailwind CSS on
@@ -135,6 +136,8 @@ A new page that needs a login goes into the folder `src/app/(app)/`. The name in
 
 A person without a login who opens `/?completed=true` is sent to `/login?next=%2F%3Fcompleted%3Dtrue` and gets that page after the login. A wrong email or password shows one message, and the fields keep their values.
 
+The value `next` is used only when it is a path inside the app: it starts with one `/`, and it holds no backslash, no tab, no line break and no other control character. Every other value gives the start page, so a login link cannot send a person to another site (`safeNextPath` of `@repo/shared/auth`).
+
 ## The todo list
 
 The start page, `/`, is `TodoList` of `src/features/todos`.
@@ -155,6 +158,27 @@ Each todo of the list shows its tags, each as a dot in the color of the tag and 
 
 The dialog, the page buttons and the state box are `Dialog`, `Pagination` and `StateMessage` of `@repo/ui/components`. In a dialog the focus stays inside it, the Escape key closes it, and the focus returns to the button that opened it.
 
+## Security headers
+
+`next.config.ts` adds these headers to every answer of the app. The list and the reason for each line are in `security-headers.ts`.
+
+| Header | Value | What it does |
+|---|---|---|
+| `X-Frame-Options` | `DENY` | No other site can show the app inside a frame |
+| `X-Content-Type-Options` | `nosniff` | The browser does not guess the type of a file |
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | Another site gets the address of the site only, not the page |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), payment=(), usb=()` | The pages cannot use these features of the device |
+| `Content-Security-Policy` | see the file | The pages load code, styles, pictures and fonts only from the app, and send requests only to the app and to the server (`NEXT_PUBLIC_API_BASE_URL`) |
+
+The answers do not have the header `X-Powered-By`.
+
+When a page must load something from another site, for example a picture from a file store, add that site to the right line of `contentSecurityPolicy` in `security-headers.ts`. The browser console names the line that blocked a file.
+
+Two limits:
+
+- The policy allows scripts and styles that are written into the page (`'unsafe-inline'`), because Next.js writes such scripts into each page. A stricter policy needs a new random value (a nonce) for each request. That is not set up here.
+- The app does not send `Strict-Transport-Security`. On a real server, the proxy or the host that ends https sends it.
+
 ## Languages
 
 Every text of the app exists in English (`src/i18n/messages/en.json`) and in Portuguese of Brazil (`src/i18n/messages/pt-BR.json`). A component never holds a text: it reads it with `useTranslations` of next-intl. ESLint refuses a text written directly in a component, and a test fails when a key is missing in one language.
@@ -173,6 +197,6 @@ How to change a color, add a component and update the library: [docs/theme.md](.
 
 ## Status
 
-- **Done:** the app, its settings, its commands, the login page and the logout button, the todo list (create, edit, complete, reopen, delete, the completed filter, the pages), the tags of a todo and the filter by tag, English and Portuguese (Brazil) with the language switch, the component library with the theme of this project and the theme switch, the tests of all of them.
-- **Not done:** nothing that is planned for this app. End-to-end tests are a later milestone.
+- **Done:** the app, its settings, its commands, the login page and the logout button, the todo list (create, edit, complete, reopen, delete, the completed filter, the pages), the tags of a todo and the filter by tag, English and Portuguese (Brazil) with the language switch, the component library with the theme of this project and the theme switch, the tests of all of them, and the 2 end-to-end tests of this app in the folder `e2e/` (`make e2e`).
+- **Not done:** nothing that is planned for this app.
 - **What you must do:** follow [docs/setup-guide.md](../../docs/setup-guide.md), then run `make run` and open `http://localhost:3000`.

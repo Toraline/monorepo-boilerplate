@@ -17,8 +17,8 @@
     "theme": "node scripts/write-theme-css.ts"
   },
   "dependencies": {
-    "@toraline.tech/tokens": "0.3.0",
-    "@toraline.tech/ui": "0.3.0"
+    "@toraline.tech/tokens": "0.3.1",
+    "@toraline.tech/ui": "0.3.1"
   },
   "peerDependencies": {
     "next": "16.4.3",

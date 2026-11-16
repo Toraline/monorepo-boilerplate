@@ -30,6 +30,7 @@
       "emailRequired": "Digite seu e-mail.",
       "passwordRequired": "Digite sua senha.",
       "wrongCredentials": "O e-mail ou a senha não está correto.",
+      "tooManyAttempts": "Muitas tentativas de login. Tente de novo mais tarde.",
       "serverError": "O servidor não respondeu. Tente de novo."
     },
     "session": {

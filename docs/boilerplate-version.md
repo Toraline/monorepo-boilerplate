@@ -100,6 +100,8 @@ The 5 kinds:
 
 The first release, `0.1.0`, has one update, `0.1.0-first-release`. It describes the boilerplate as it is at that release. A monorepo that is created from `0.1.0` already has it.
 
+The updates file of a published release is never edited: monorepos already read it. So `coreVersion` of an older file can differ from `agent/CORE_VERSION` of today. `make check` compares `agent/CORE_VERSION` only with the newest updates file.
+
 ### How to add a release
 
 1. Write the new version into `boilerplate/VERSION` and into `version` of `cli/create-toraline-monorepo/package.json` and `cli/update-toraline-monorepo/package.json`.
@@ -135,6 +137,8 @@ A repository that was started from the boilerplate before the record file existe
 
 ## Status
 
-- **Done:** the version file, the updates folder with the file of `0.1.0`, the record file, the test that compares them.
-- **Not done:** no release exists yet. The tag `v0.1.0` is created by the first run of the workflow "Release" with the box "publish" on.
+- **Done:** the version file, the updates folder with one file per version, the record file, the test that compares them.
+- **Done:** the first release, `0.1.0`, on 2026-11-16: the tag `v0.1.0` exists and both commands are on npm.
+- **On 2026-11-16:** `0.1.0` is published. `0.1.1` is prepared in the files (`boilerplate/VERSION`, `boilerplate/updates/0.1.1.json`, the 2 packages) and is not published.
+- **Not done:** nothing that is planned for this document. A version that is in `boilerplate/VERSION` and has no tag yet is prepared and not published; this prints the published versions: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git`.
 - **What you must do:** nothing for this document. To release: [releasing.md](releasing.md).

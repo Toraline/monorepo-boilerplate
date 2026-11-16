@@ -1,0 +1,171 @@
+{
+  "version": "0.1.1",
+  "date": "2026-11-16",
+  "coreVersion": "0.1.9",
+  "updates": [
+    {
+      "id": "0.1.1-login-redirect",
+      "title": "The login link cannot send a person to another site after the login",
+      "kind": "security",
+      "appliedBy": "agent",
+      "files": [
+        "packages/shared/src/auth/next-path.ts",
+        "packages/shared/src/auth/next-path.test.ts",
+        "apps/web/src/app/login/page.test.tsx",
+        "apps/internal/src/app/login/page.test.tsx"
+      ],
+      "whatToDo": "The problem: the value `next` of the login page accepted `/<tab>/example.com`. A browser deletes the tab and opens `//example.com`, another site. Copy the 4 files from the release. When your project changed `next-path.ts`: make `safeNextPath` refuse a value that holds a character with a code below 32 or the code 127, a value with a broken `%XX` code, and a value that fails the same check after one more `decodeURIComponent`; then copy the new rows of the 3 test files. Run `make test-shared test-web test-internal`."
+    },
+    {
+      "id": "0.1.1-security-headers",
+      "title": "Both web apps send security headers: no frame on another site, no guessed content type, a content security policy",
+      "kind": "security",
+      "appliedBy": "agent",
+      "files": [
+        "apps/web/security-headers.ts",
+        "apps/web/security-headers.test.ts",
+        "apps/web/next.config.ts",
+        "apps/web/README.md",
+        "apps/internal/security-headers.ts",
+        "apps/internal/security-headers.test.ts",
+        "apps/internal/next.config.ts",
+        "apps/internal/README.md"
+      ],
+      "whatToDo": "Copy `security-headers.ts` and `security-headers.test.ts` into `apps/web` and `apps/internal`. In both `next.config.ts` files add the import of `securityHeaders`, the line `poweredByHeader: false`, and the function `headers()`, as the release has them. Copy the section \"Security headers\" of both README files. When a page of your project loads a script, a style, a picture or a font from another site, or sends a request to another address than the server, add that site to the right line of `contentSecurityPolicy` first: the browser blocks it otherwise. Run `make check` and `make e2e`, then open both apps and check that the browser console shows no blocked file."
+    },
+    {
+      "id": "0.1.1-login-limit",
+      "title": "The server limits login attempts: 10 in one minute from one network address, for the API login and the Django admin login",
+      "kind": "security",
+      "appliedBy": "agent",
+      "files": [
+        "apps/api/apps/core/throttling.py",
+        "apps/api/apps/core/tests/test_throttling.py",
+        "apps/api/apps/accounts/views.py",
+        "apps/api/config/urls.py",
+        "apps/api/config/settings.py",
+        "apps/api/config/startup.py",
+        "apps/api/config/test_runner.py",
+        "apps/api/README.md",
+        "apps/web/src/features/auth/components/login-screen.tsx",
+        "apps/web/src/features/auth/components/login-screen.test.tsx",
+        "apps/web/src/i18n/messages/en.json",
+        "apps/web/src/i18n/messages/pt-BR.json",
+        "apps/internal/src/features/auth/components/login-screen.tsx",
+        "apps/internal/src/features/auth/components/login-screen.test.tsx",
+        "apps/internal/src/i18n/messages/en.json",
+        "apps/internal/src/i18n/messages/pt-BR.json",
+        "e2e/playwright.config.ts",
+        ".env.example"
+      ],
+      "whatToDo": "1. Copy `apps/api/apps/core/throttling.py`, `apps/api/apps/core/tests/test_throttling.py`, `apps/api/config/test_runner.py` and `apps/api/config/startup.py` from the release. 2. In `apps/api/config/settings.py` add the key `NUM_PROXIES` to `REST_FRAMEWORK`, and the settings `LOGIN_THROTTLE_RATE` and `TEST_RUNNER`, as the release has them. 3. In `apps/api/apps/accounts/views.py` add `@throttle_classes([LoginRateThrottle])` to the view `login`. 4. In `apps/api/config/urls.py` add the path `admin/login/` with the view `admin_login`, above `admin.site.urls`. 5. In `login-screen.tsx` of both web apps add the message for the status 429, and add the key `auth.login.tooManyAttempts` to the 4 messages files; copy the new test of `login-screen.test.tsx`. 6. In `e2e/playwright.config.ts` add `LOGIN_THROTTLE_RATE: \"1000/minute\"` to the environment of the server. 7. Copy the commented lines `LOGIN_THROTTLE_RATE` and `NUM_PROXIES` of `.env.example`, and the section \"The limit on login attempts\" of `apps/api/README.md`. 8. Run `make check` and `make e2e`. On a real server behind a proxy, set `NUM_PROXIES`; with more than one server process, set a shared cache (`CACHES`)."
+    },
+    {
+      "id": "0.1.1-server-https-and-keys",
+      "title": "Outside local mode the server forces https, and does not start with a short secret key or the sample database password",
+      "kind": "security",
+      "appliedBy": "agent",
+      "files": [
+        "apps/api/config/startup.py",
+        "apps/api/config/settings.py",
+        "apps/api/apps/core/tests/test_startup.py",
+        "apps/api/README.md",
+        ".env.example",
+        "docs/setup-guide.md"
+      ],
+      "whatToDo": "1. Copy `apps/api/config/startup.py` and `apps/api/apps/core/tests/test_startup.py` from the release. 2. In `apps/api/config/settings.py`: replace the check of `SECRET_KEY` with the call of `refuse_unsafe_secret_key`, add the check of `POSTGRES_PASSWORD` with `refuse_sample_database_password`, import `SAMPLE_VALUE_PREFIX` from `config.startup`, and add the block \"https\" at the end of the file (`SECURE_SSL_REDIRECT`, `SECURE_REDIRECT_EXEMPT`, `SECURE_HSTS_SECONDS`, `SECURE_HSTS_INCLUDE_SUBDOMAINS`, `TRUST_PROXY_HTTPS_HEADER`). 3. Copy the new rows of the table \"Settings\" and the new points of \"On a real server\" of `apps/api/README.md`, and the commented lines of `.env.example`. 4. Run `make test-api`. Nothing changes on a local machine (`DJANGO_DEBUG=True`). Before the next deploy of a real server, check its variables: `DJANGO_SECRET_KEY` needs 50 characters or more, `POSTGRES_PASSWORD` must not start with `sample-`, and a server behind a proxy that ends https needs `TRUST_PROXY_HTTPS_HEADER=True`, or every request is answered with a redirect."
+    },
+    {
+      "id": "0.1.1-tag-ids-limit",
+      "title": "The sample product: a todo accepts 50 tag ids at most in one request",
+      "kind": "security",
+      "appliedBy": "agent",
+      "files": [
+        "apps/api/apps/todos/models.py",
+        "apps/api/apps/todos/serializers.py",
+        "apps/api/apps/todos/tests/test_tags_api.py",
+        "apps/api/README.md"
+      ],
+      "whatToDo": "Only when your monorepo kept the sample product (the folder `apps/api/apps/todos` exists). Add the constant `TAG_IDS_MAX_LENGTH = 50` to `models.py`, pass it as `max_length` to the field `tagIds` of `TodoWriteSerializer`, and copy the test `test_more_than_50_tag_ids_is_an_error_on_the_field`. Give a list field of your own serializers a `max_length` too. Run `make test-api`."
+    },
+    {
+      "id": "0.1.1-core",
+      "title": "The core 0.1.9: the secret check finds more kinds of secrets, env files in every folder, binary and renamed files, and private names",
+      "kind": "core-files",
+      "appliedBy": "program",
+      "files": [
+        "agent/",
+        "scripts/check-secrets.sh"
+      ],
+      "whatToDo": "Copy the folder `agent/` and the file `scripts/check-secrets.sh` from the release. The script now also refuses a line `NAME=value` whose name holds PASSWORD, SECRET, TOKEN, API_KEY or PRIVATE_KEY, unless the value starts with `sample-` or is a placeholder."
+    },
+    {
+      "id": "0.1.1-worktree-port",
+      "title": "A new worktree gets the first database port from 5433 up that nothing uses",
+      "kind": "core-files",
+      "appliedBy": "program",
+      "files": [
+        "scripts/worktree-setup.local.sh"
+      ],
+      "whatToDo": "Copy `scripts/worktree-setup.local.sh` from the release. Before, a worktree could keep the port 5432 of `.env.example` when the main checkout used another port. An existing worktree gets a new port and a comment line above `POSTGRES_PORT` at its next `make env`."
+    },
+    {
+      "id": "0.1.1-check-workflow",
+      "title": "The automatic check on GitHub names each action by a commit id, and checks each pull request for secrets",
+      "kind": "security",
+      "appliedBy": "agent",
+      "files": [
+        ".github/workflows/check.yml"
+      ],
+      "whatToDo": "Apply the update 0.1.1-core first: the new step needs the new `scripts/check-secrets.sh`. In `.github/workflows/check.yml`: 1. Replace `actions/checkout@v4`, `actions/setup-node@v4`, `actions/setup-python@v5` and `actions/upload-artifact@v4` with the lines of the release, which name a full commit id and have the version in a comment. 2. Give the checkout step `fetch-depth: 2`. 3. Add the step \"Check the pull request for secrets\" after it. Do the same for every other workflow of your project: name each action by a commit id, and give each workflow a `permissions:` block with the least it needs."
+    },
+    {
+      "id": "0.1.1-component-library",
+      "title": "The component library @toraline.tech/ui and @toraline.tech/tokens 0.3.1",
+      "kind": "dependency-versions",
+      "appliedBy": "agent",
+      "files": [
+        "apps/web/package.json",
+        "apps/internal/package.json",
+        "apps/ui-catalog/package.json",
+        "packages/ui/package.json",
+        "package-lock.json",
+        "packages/ui/src/theme/theme.generated.css"
+      ],
+      "whatToDo": "Follow the section \"Update the library\" of `docs/theme.md`: 1. Write `0.3.1` for `@toraline.tech/tokens` and `@toraline.tech/ui` in the 4 `package.json` files. 2. Run `make install-js`. 3. Run `npm run theme --workspace packages/ui`, which writes `packages/ui/src/theme/theme.generated.css` again. 4. Run `make check`. A program cannot apply this update, because step 3 is needed for the test of the theme to pass."
+    },
+    {
+      "id": "0.1.1-typescript-eslint",
+      "title": "typescript-eslint 8.73.0 in the lock file, which removes 6 moderate findings of npm audit",
+      "kind": "dependency-versions",
+      "appliedBy": "agent",
+      "files": [
+        "package-lock.json"
+      ],
+      "whatToDo": "`typescript-eslint` is a package of `eslint-config-next`, so no `package.json` names it. Run `npm update typescript-eslint` in the root folder, then `npm audit` and `make lint`. 4 moderate findings stay: `@storybook/react-vite` 10.6.7 needs a version of `glob` that has no fix."
+    },
+    {
+      "id": "0.1.1-project-files",
+      "title": "A pull request template and an .editorconfig file",
+      "kind": "new-feature",
+      "appliedBy": "agent",
+      "files": [
+        ".github/pull_request_template.md",
+        ".editorconfig"
+      ],
+      "whatToDo": "Copy the 2 files from the release, when your project has none. The skill `/open-pr` uses the template for the text of a new pull request. Change the template when your project wants other headings."
+    },
+    {
+      "id": "0.1.1-documents",
+      "title": "The documents no longer say that the boilerplate needs a login to GitHub, and the setup guide has the rules about private names",
+      "kind": "manual-change",
+      "appliedBy": "agent",
+      "files": [
+        "docs/update-a-monorepo.md",
+        "docs/setup-guide.md",
+        ".env.example"
+      ],
+      "whatToDo": "1. `docs/update-a-monorepo.md`: copy it from the release, when your project did not change it. 2. `docs/setup-guide.md`: copy the points about the secret check and the section \"Private names\" of section 6. 3. Optional: create the file `local-docs/private-names.txt` in the main checkout with the names that must never be committed, one per line. The pre-commit hook then refuses a commit that adds one. 4. `.env.example`: replace the comment above `POSTGRES_PORT` with the comment of the release, which says how a worktree gets its port."
+    }
+  ]
+}

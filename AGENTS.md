@@ -1,6 +1,6 @@
 # monorepo-boilerplate: instructions for agents
 
-The public starting point for Toraline monorepos: a small todo-list product with a server, a public web app and an internal app, plus the standard way of working with AI agents (skills, rules, scripts). It is generic on purpose. It never contains real keys or real data.
+The public starting point for Toraline monorepos. It is generic on purpose, and it never contains real keys or real data. It has two parts: the standard way of working with AI agents (skills, rules, scripts), and three apps: a server, a public web app and an internal app. The apps hold a small sample product, a todo list.
 
 ## Project profile
 

@@ -21,12 +21,22 @@ describe("LoginPage", () => {
   it("gives the login screen the page to return to", async () => {
     await renderPage("/?tag=2");
 
-    expect(screen.getByTestId("login-screen")).toHaveTextContent("/?tag=2");
+    expect(screen.getByTestId("login-screen").textContent).toBe("/?tag=2");
   });
 
-  it("returns to the start page when the address names another site", async () => {
-    await renderPage("https://example.com/");
+  // Next.js decodes the address before the page reads it: `?next=/%09/…`
+  // arrives here as a slash, a tab, a slash.
+  it.each([
+    ["the address of another site", "https://example.com/"],
+    ["an address without its protocol", "//example.com/x"],
+    ["a tab between two slashes", "/\t/example.com/x"],
+    ["a line break between two slashes", "/\n/example.com/x"],
+    ["a carriage return between two slashes", "/\r/example.com/x"],
+    ["a backslash", "/\\example.com/x"],
+    ["an encoded tab that is still encoded", "/%09/example.com/x"],
+  ])("returns to the start page when the address names %s", async (_name, next) => {
+    await renderPage(next);
 
-    expect(screen.getByTestId("login-screen")).toHaveTextContent("/");
+    expect(screen.getByTestId("login-screen").textContent).toBe("/");
   });
 });

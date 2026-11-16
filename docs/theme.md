@@ -116,8 +116,8 @@ The two packages of the library always have the same version, and the version is
 2. In each file, change the version of both lines to the new version, written exactly, with no `^`:
 
    ```json
-   "@toraline.tech/tokens": "0.3.0",
-   "@toraline.tech/ui": "0.3.0",
+   "@toraline.tech/tokens": "0.3.1",
+   "@toraline.tech/ui": "0.3.1",
    ```
 
 3. Install. Run this command from the root folder of the repository:

@@ -16,6 +16,8 @@ type LoginScreenProps = {
 // The statuses that mean "the email or the password is not correct": 401, and
 // 400 when the server refuses the form of a value, for example of the email.
 const WRONG_CREDENTIALS_STATUSES = [400, 401];
+// The status that the server answers above its limit on login attempts.
+const TOO_MANY_ATTEMPTS_STATUS = 429;
 
 /**
  * The login page: a title and the login form. After a login, and when the
@@ -37,9 +39,15 @@ export function LoginScreen({ nextPath }: LoginScreenProps) {
   const wrongCredentials =
     isApiError(loginRequest.error) &&
     WRONG_CREDENTIALS_STATUSES.includes(loginRequest.error.status);
+  const tooManyAttempts =
+    isApiError(loginRequest.error) &&
+    loginRequest.error.status === TOO_MANY_ATTEMPTS_STATUS;
+  const otherFailureMessage = tooManyAttempts
+    ? t("tooManyAttempts")
+    : t("serverError");
   const failureMessage = wrongCredentials
     ? t("wrongCredentials")
-    : t("serverError");
+    : otherFailureMessage;
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center gap-6 p-8">

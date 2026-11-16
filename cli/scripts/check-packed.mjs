@@ -1,7 +1,9 @@
 // Checks what each of the two packages would hold on npm. It packs nothing for
 // real: "npm pack --dry-run" only lists the files. It stops with an error when
 // a package holds a file that is not expected (a file of the template, an env
-// file), or when a packed file holds a personal path or an email address.
+// file), when the license file is missing or differs from the file LICENSE of
+// the repository root, or when a packed file holds a personal path or an email
+// address.
 // Run it after the build: "make build-cli" does both.
 import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
@@ -12,7 +14,9 @@ const cliDirectory = join(dirname(fileURLToPath(import.meta.url)), "..");
 const packageNames = ["create-toraline-monorepo", "update-toraline-monorepo"];
 
 // The only files that a package may hold.
-const allowedFiles = ["README.md", "dist/index.js", "package.json"];
+const allowedFiles = ["LICENSE", "README.md", "dist/index.js", "package.json"];
+// The license of the repository. The build copies it into each package.
+const repositoryLicense = readFileSync(join(cliDirectory, "..", "LICENSE"), "utf8");
 
 // A path of one person's machine: the home folder of macOS, Linux or Windows.
 const personalPath = /\/Users\/|\/home\/[a-z]|[A-Z]:\\Users\\/;
@@ -55,6 +59,13 @@ for (const packageName of packageNames) {
     }
   }
   const manifest = JSON.parse(readFileSync(join(packageDirectory, "package.json"), "utf8"));
+  if (manifest.license !== "MIT") {
+    problems.push(`${packageName}: "license" in package.json must be "MIT", the license of the repository.`);
+  }
+  const licenseFile = join(packageDirectory, "LICENSE");
+  if (existsSync(licenseFile) && readFileSync(licenseFile, "utf8") !== repositoryLicense) {
+    problems.push(`${packageName}: the file LICENSE differs from the file LICENSE of the repository root. Run: make build-cli`);
+  }
   if (manifest.author !== "Toraline") {
     problems.push(`${packageName}: "author" in package.json must be "Toraline", the organization.`);
   }

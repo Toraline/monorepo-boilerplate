@@ -1,6 +1,8 @@
 // Builds the two commands: one file per package, dist/index.js, with the code
 // of cli/shared inside it. A package has no dependency at run time.
-import { chmodSync, existsSync, readFileSync, rmSync } from "node:fs";
+// It also copies the file LICENSE of the repository root into each package, so
+// that the packed package holds the license. git ignores the copies.
+import { chmodSync, copyFileSync, existsSync, readFileSync, rmSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -29,5 +31,6 @@ for (const packageName of ["create-toraline-monorepo", "update-toraline-monorepo
     legalComments: "none",
   });
   chmodSync(outputFile, 0o755);
+  copyFileSync(join(cliDirectory, "..", "LICENSE"), join(packageDirectory, "LICENSE"));
   console.log(`Built ${packageName} ${version}: ${packageName}/dist/index.js`);
 }

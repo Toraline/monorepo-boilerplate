@@ -56,13 +56,15 @@ You also need the tools of section 1 of the [setup guide](setup-guide.md): git, 
 
    It worked when: the output has the line `Created <folder> from the boilerplate <version>.`, and then the list "Next steps".
 
-3. The command downloads the boilerplate from GitHub with your git login, at the newest release. When it stops with `The boilerplate could not be read`: run `gh auth login`, then `gh auth setup-git`, and run the command again.
+3. The command downloads the boilerplate from GitHub, at the newest release. The boilerplate is public: git needs the network and no login. When it stops with `The boilerplate could not be read`, run `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git`. It must print one line per release. With no network, give the command a local copy of the boilerplate: `--source <folder>`.
 
 What the command did, in the new folder:
 
-- Steps 1, 2 (points 1, 4, 5 and 6), 3 (point 2) and 5 (point 1) of the second way. With the answer `no` to the last question, also step 9, points 1 to 10.
+- Steps 1, 2 (points 1, 4, 5 and 6), 3 (point 2) and 5 (point 1) of the second way. With the answer `no` to the last question, also step 9, points 1 to 10 and point 12: the code of the sample product is removed, and the documents no longer describe it.
+- It wrote a starting text at the top of `README.md` and `AGENTS.md`, with one line in italics that you replace with 2 sentences about your project.
 - It wrote the record file `.toraline-monorepo.json`: the version of the boilerplate that your monorepo was created from. The command `npx update-toraline-monorepo` reads it later ([update-a-monorepo.md](update-a-monorepo.md)).
-- It removed the files that belong only to the boilerplate itself.
+- It removed the files that belong only to the boilerplate itself, also the file `LICENSE`, the line `"license"` of `package.json` and the section "License" of `README.md` (step 1, point 5).
+- It removed the files `SECURITY.md` and `CONTRIBUTING.md` and the 2 pictures of `README.md`, which are about the boilerplate, and it replaced `docs/decisions.md` with an empty list for the decisions of your project (step 1, point 6). It does this with and without the sample product.
 - It made the first commit: `chore: start from the boilerplate <version>`.
 
 What the command did not do. Do these next, in this order:
@@ -70,9 +72,9 @@ What the command did not do. Do these next, in this order:
 1. Step 4: connect GitHub and Linear. The command never creates a repository on GitHub, a project in Linear or an account.
 2. Step 5, point 2: change `POSTGRES_PORT` in `.env` when another PostgreSQL uses port 5432 on your machine.
 3. Steps 6 and 7: the setup, and the first login.
-4. Step 2, point 3: write 2 sentences about your project at the top of `AGENTS.md` and of `README.md`.
+4. Step 2, point 3: write 2 sentences about your project at the top of `AGENTS.md` and of `README.md`, in the place of the line in italics.
 5. Step 8: the theme.
-6. When you removed the sample product: step 9, point 12 (the documents that still describe the todo list).
+6. Choose the license of your project. The new folder has no file `LICENSE`. When you want one, add a file `LICENSE` and the line `"license"` to `package.json`.
 7. Steps 10 and 11: the checks, the repository on GitHub, and the start of the work.
 
 ### The command with no question
@@ -107,7 +109,7 @@ Steps 1 to 11. With the command of the first way, you do only the steps that its
 2. Copy the boilerplate into a folder with the name of your project:
 
    ```bash
-   git clone git@github.com:Toraline/monorepo-boilerplate.git my-project
+   git clone https://github.com/Toraline/monorepo-boilerplate.git my-project
    ```
 
 3. Enter the folder:
@@ -125,6 +127,22 @@ Steps 1 to 11. With the command of the first way, you do only the steps that its
    git commit -m "chore: start from the boilerplate"
    ```
 
+5. The license. The file `LICENSE` holds the license of the boilerplate (MIT, copyright Toraline). Your project chooses its own license. Do one of the two:
+   - **You want no license yet, or another one:** delete the file `LICENSE`, delete the line `"license": "MIT",` in `package.json`, and delete the row `LICENSE` of the table and the section "License" at the end of `README.md`. Add your own license later.
+   - **You want the MIT license for your project too:** keep the file, and write your own name in its line `Copyright (c)`, under a line that keeps the notice of the boilerplate. In `README.md`, delete the second paragraph of the section "License".
+
+6. The files that are about the boilerplate itself. Run this before you delete the folder `boilerplate/`:
+
+   ```bash
+   rm SECURITY.md CONTRIBUTING.md
+   rm -r docs/images
+   cp boilerplate/new-project/docs/decisions.md docs/decisions.md
+   ```
+
+   - `SECURITY.md` and `CONTRIBUTING.md` say how to report a problem of the boilerplate. Write your own when your project is public.
+   - `docs/decisions.md` becomes an empty list for the decisions of your project. The decisions of the boilerplate stay in the boilerplate.
+   - In `README.md`, delete the text from the first line under the title down to the line "The pictures show the sample product with invented sample data.", the rows `SECURITY.md`, `CONTRIBUTING.md` and `docs/images/` of the table, and the section "Security and contributions". Step 2, point 3 writes 2 sentences about your project in that place.
+
 It worked when: `git log --oneline` prints exactly 1 line, and `ls` shows `Makefile`, `apps`, `packages` and `agent`.
 
 You create the repository on GitHub in step 10, after the checks pass. Until then everything is only on your machine.
@@ -140,8 +158,8 @@ Run every command of this page from the root folder of your project.
    | `package.json` | `"name": "monorepo-boilerplate",` | `"name": "my-project",` |
    | `Makefile`, line 1 | `# monorepo-boilerplate: run every command from the repository root.` | `# my-project: run every command from the repository root.` |
    | `AGENTS.md`, line 1 | `# monorepo-boilerplate: instructions for agents` | `# my-project: instructions for agents` |
-   | `README.md` | `# monorepo-boilerplate`, the line `monorepo-boilerplate/` at the top of the folder tree, and the 2 lines `git clone git@github.com:Toraline/monorepo-boilerplate.git` and `cd monorepo-boilerplate` | `# my-project`, `my-project/`, `git clone git@github.com:my-owner/my-project.git` and `cd my-project` |
-   | `docs/setup-guide.md`, step 1 | `git clone git@github.com:Toraline/monorepo-boilerplate.git` and `cd monorepo-boilerplate` | `git clone git@github.com:my-owner/my-project.git` and `cd my-project` |
+   | `README.md` | `# monorepo-boilerplate`, the line `monorepo-boilerplate/` at the top of the folder tree, and, in the section "Try it", the 2 lines `git clone https://github.com/Toraline/monorepo-boilerplate.git` and `cd monorepo-boilerplate` | `# my-project`, `my-project/`, `git clone git@github.com:my-owner/my-project.git` and `cd my-project` |
+   | `docs/setup-guide.md`, step 1 | `git clone https://github.com/Toraline/monorepo-boilerplate.git` and `cd monorepo-boilerplate` | `git clone git@github.com:my-owner/my-project.git` and `cd my-project` |
 
 2. Do not change the other lines that name `monorepo-boilerplate`. They are in `README.md` (the section "Use the core in another project"), in `docs/setup-guide.md` (section 5), in `scripts/sync-skills.sh` and in `scripts/doctor.sh`. They name the place where your project gets newer skills from, which is the boilerplate.
 3. In `AGENTS.md`, replace the paragraph under the first line with 2 sentences about your project. Do the same with the first paragraphs of `README.md`.
@@ -376,11 +394,10 @@ These files stay, and each has lines that name the sample product. Change them a
 | `apps/internal/src/app/(admin)/page.test.tsx` | The text of `home.description` |
 | `packages/ui/src/components/index.ts` | The line that exports `TagBadge` |
 | `e2e/tests/support/login.ts`, `e2e/tests/login.spec.ts` | They wait for the title of the todo list |
-| `apps/api/README.md`, `apps/web/README.md`, `apps/internal/README.md`, `packages/ui/README.md`, `e2e/README.md`, `docs/setup-guide.md`, `docs/workflow/module-model.md`, `AGENTS.md`, `README.md` | Text about the todo list |
+| `apps/api/README.md`, `apps/web/README.md`, `apps/internal/README.md`, `e2e/README.md`, `docs/start-a-new-monorepo.md` | Text about the todo list in most sections. `boilerplate/without-sample/` has a version of each file without it |
+| `README.md`, `AGENTS.md`, `apps/README.md`, `packages/ui/README.md`, `apps/ui-catalog/README.md`, `docs/setup-guide.md`, `docs/theme.md`, `docs/workflow/working-pattern.md`, `docs/workflow/module-model.md` | Some lines about the todo list, the tags, the history or the component `TagBadge` |
 
 These files are not part of the todo list, but only the todo list uses them today. Keep them for your own lists, or delete them: `apps/internal/src/features/users/` (the list of the users, for a filter), `apps/internal/src/components/list-pagination.tsx`, `apps/internal/src/lib/format/use-date-time-format.ts`, and the group `pagination` of the messages files of `apps/internal`.
-
-`docs/decisions.md` keeps its entries about the todo list. They are the history of the boilerplate. Add your own entries above them.
 
 ### Remove it
 
@@ -494,7 +511,25 @@ These files are not part of the todo list, but only the todo list uses them toda
 
     It worked when: the last line is `The first admin was created: admin@example.com` (with your email when you changed it).
 
-12. The documents. Delete the parts about todos, tags and history in the files of the last row of the second table. `docs/workflow/module-model.md` names the todo product as the model for a new module: delete the file now, and write it again when your first own module exists. In `apps/api/README.md` they are the sections "Sample data", "The todos of a user", "The tags", and the requests `/api/todos/`, `/api/tags/`, `/api/admin/todos/` and `/api/admin/history/`.
+12. The documents. The command `npx create-toraline-monorepo` does this point for you. By hand:
+    1. Do this point before you delete the folder `boilerplate/`. Copy the 5 documents of `boilerplate/without-sample/` over the files with the same paths.
+
+       ```bash
+       for file in apps/api/README.md apps/web/README.md apps/internal/README.md e2e/README.md docs/start-a-new-monorepo.md; do
+         cp "boilerplate/without-sample/$file" "$file"
+       done
+       ```
+
+    2. Delete `docs/workflow/module-model.md`. It names the todo product as the model for a new module. Write it again when your first own module exists.
+    3. In the 8 other files of the last row of the second table, delete or change the lines about todos, tags, history and `TagBadge`. The exact lines are the entries of the list `replace` of the group `sampleProduct` in `boilerplate/create-manifest.json` whose `file` ends with `.md`.
+
+    It worked when: this command prints nothing.
+
+    ```bash
+    grep -rli "todo" --include='*.md' --exclude-dir=node_modules --exclude-dir=agent --exclude-dir=boilerplate . | grep -v "docs/workflow/status-skills.md"
+    ```
+
+    `docs/workflow/status-skills.md` names "Todo", a status of a ticket in Linear. That is not the sample product.
 
 It worked when: step 10 passes.
 
@@ -567,9 +602,11 @@ Checked on 2026-11-15, on macOS, in a new folder outside every repository. The f
 
 The command of the first way was checked on 2026-11-15, on macOS, with a local copy of the boilerplate as its source (`--source`), two times: with `--keep-sample` and with `--remove-sample`. In both new folders `make setup` and `make check` passed. With `--keep-sample`: 170 tests of the server, 71 of `apps/web`, 98 of `apps/internal`, 103 of `packages/shared`, 58 of `packages/ui`. With `--remove-sample`: 58, 29, 29, 103 and 56, and `make e2e` printed `1 passed`.
 
+The removal of the sample product from the documents (step 9, point 12, done by the command) was checked on 2026-11-16, on macOS, with a local copy of the boilerplate as the source and `--remove-sample`. In the new folder `make setup` and `make check` passed: 58 tests of the server, 29 of `apps/web`, 29 of `apps/internal`, 103 of `packages/shared`, 56 of `packages/ui`. The command under "It worked when" of point 12 printed nothing.
+
 Not run:
 
-- The command with GitHub as its source: no release of the boilerplate exists yet.
+- The command with GitHub as its source. The runs above were made before the first release (`0.1.0`, 2026-11-16) and were not repeated after it.
 - Step 1, the clone from GitHub. Step 10, point 4: no repository was created on GitHub, so the automatic check did not run for the new project.
 - Step 2, point 3 (the 2 sentences about the project).
 - Step 3, point 3: no other value of the profile was changed.
@@ -577,7 +614,7 @@ Not run:
 - Step 6, `nvm install`: the machine already had Node 24.
 - Step 7, points 3 to 5 in a browser with the todo list: the login was checked with the login request of the server and with the end-to-end test.
 - Step 8, point 7: the catalog was not opened in the copy. It was opened in the boilerplate itself.
-- Step 9, point 12 (the documents).
+- Step 9, point 12 by hand (the documents). The command did it.
 - Step 11: no skill was run in the copy.
 - Windows and Linux.
 

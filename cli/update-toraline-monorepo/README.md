@@ -20,7 +20,7 @@ Every flag: `npx update-toraline-monorepo --help`.
 ## What you need
 
 - Node 24 or newer, and git.
-- Access to the repository `Toraline/monorepo-boilerplate` with your git login.
+- The network. The repository `Toraline/monorepo-boilerplate` is public: git reads it with no login.
 - The record file `.toraline-monorepo.json` in the root folder. `create-toraline-monorepo` writes it. For an older repository: `npx update-toraline-monorepo --init-record <version>`.
 
 ## What it does
@@ -34,3 +34,7 @@ Every flag: `npx update-toraline-monorepo --help`.
 7. Prints the next step: the skill `/update-boilerplate`, which an AI agent follows to do the rest.
 
 It never pushes, never opens a pull request and never writes to a ticket tool.
+
+## License
+
+MIT. The package holds the file `LICENSE`.

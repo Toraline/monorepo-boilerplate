@@ -45,7 +45,7 @@ Other flags:
                            Default: my-owner
   --database-port <port>   The port of the database on this machine, written into .env. Default: 5432
   --source <where>         Where to get the boilerplate from: a folder of this machine or a git address.
-                           Default: Toraline/monorepo-boilerplate on GitHub, with your git login.
+                           Default: Toraline/monorepo-boilerplate on GitHub. It is public and needs no login.
                            The environment variable ${SOURCE_ENVIRONMENT_VARIABLE} does the same.
   --ref <tag or branch>    The tag or branch of the boilerplate to use. Default: the newest release tag (vX.Y.Z).
   --version, -v            Print the version of this command.

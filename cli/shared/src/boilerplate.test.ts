@@ -1,11 +1,11 @@
 // Checks of the boilerplate itself: its version, its updates files and the two
 // packages must agree. A release with a wrong number fails here, in "make check".
 import { existsSync, readFileSync, readdirSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { BOILERPLATE_ROOT } from "./testing";
+import { BOILERPLATE_ROOT, git } from "./testing";
 import { parseReleaseUpdates, UPDATES_FOLDER, VERSION_FILE } from "./updates";
 import { isVersion, sortVersions } from "./versions";
 
@@ -49,5 +49,66 @@ describe("the version of the boilerplate", () => {
         expect(JSON.parse(readFileSync(packageFile, "utf8")).version, packageName).toBe(version);
       }
     }
+  });
+});
+
+describe("the workflows of GitHub", () => {
+  const workflowsFolder = join(BOILERPLATE_ROOT, ".github", "workflows");
+  const workflows = readdirSync(workflowsFolder).map((fileName) => ({
+    fileName,
+    text: readFileSync(join(workflowsFolder, fileName), "utf8"),
+  }));
+
+  it("name every action by the full id of a commit, with the version in a comment", () => {
+    const usesLines = workflows.flatMap((workflow) =>
+      workflow.text
+        .split("\n")
+        .filter((line) => /^\s*(- )?uses:/.test(line))
+        .map((line) => `${workflow.fileName}: ${line.trim()}`),
+    );
+
+    expect(usesLines.length).toBeGreaterThan(0);
+    for (const line of usesLines) {
+      expect(line).toMatch(/uses: [\w.-]+\/[\w./-]+@[0-9a-f]{40} # v\d+\.\d+\.\d+$/);
+    }
+  });
+
+  it("each say what the token of the run may do", () => {
+    for (const workflow of workflows) {
+      expect(workflow.text, workflow.fileName).toMatch(/^permissions:\n(?: {2}#.*\n)* {2}contents: (read|write)\n/m);
+    }
+  });
+});
+
+describe("the Markdown files of the boilerplate", () => {
+  // Some files are copied to another place before they are used. Their links are read from that place:
+  // the template of AGENTS.md from the root folder, and a file under boilerplate/without-sample/ or
+  // boilerplate/new-project/ from the path of the file that it replaces in a new monorepo.
+  function folderOfLinks(file: string): string {
+    if (file === "agent/templates/AGENTS.md") {
+      return ".";
+    }
+    return dirname(file.replace(/^boilerplate\/(without-sample|new-project)\//, ""));
+  }
+  const markdownFiles = git(BOILERPLATE_ROOT, "ls-files", "--cached", "--others", "--exclude-standard", "*.md")
+    .split("\n")
+    .filter((file) => file !== "" && existsSync(join(BOILERPLATE_ROOT, file)));
+
+  it("link only to files that exist", () => {
+    const broken: string[] = [];
+    for (const file of markdownFiles) {
+      const text = readFileSync(join(BOILERPLATE_ROOT, file), "utf8");
+      const folder = folderOfLinks(file);
+      // [text](target) and ![text](target). A target with a protocol (https:, mailto:) is not a file.
+      for (const match of text.matchAll(/\]\(([^)#\s]+)(#[^)]*)?\)/g)) {
+        const target = match[1] ?? "";
+        if (!/^[a-z]+:/.test(target) && !existsSync(join(BOILERPLATE_ROOT, folder, target))) {
+          broken.push(`${file} links to ${target}`);
+        }
+      }
+    }
+
+    expect(markdownFiles.length).toBeGreaterThan(50);
+    expect(broken).toEqual([]);
   });
 });

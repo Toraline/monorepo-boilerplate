@@ -98,6 +98,22 @@ describe("LoginScreen", () => {
     expect(server.requestsTo("POST /api/auth/login/")).toHaveLength(0);
   });
 
+  it("says that there were too many attempts when the server answers 429", async () => {
+    mockServer({
+      "GET /api/auth/me/": nobody,
+      "POST /api/auth/login/": () =>
+        Response.json({ detail: "Request was throttled." }, { status: 429 }),
+    });
+    renderWithProviders(<LoginScreen nextPath="/" />);
+
+    fillAndSend("ana.lima@example.com", "sample-password");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "Too many login attempts. Try again later.",
+    );
+    expect(navigation.replace).not.toHaveBeenCalled();
+  });
+
   it("says that the server did not answer when the login request fails", async () => {
     mockServer({
       "GET /api/auth/me/": nobody,

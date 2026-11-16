@@ -7,7 +7,11 @@
       ".github/workflows/release.yml",
       "docs/releasing.md",
       "docs/repositories.md",
-      "docs/boilerplate-version.md"
+      "docs/boilerplate-version.md",
+      "LICENSE",
+      "SECURITY.md",
+      "CONTRIBUTING.md",
+      "docs/images"
     ],
     "replace": [
       {
@@ -48,7 +52,7 @@
       },
       {
         "file": "README.md",
-        "find": "| `docs/repositories.md` | The list of the repositories that were created from this boilerplate |\n",
+        "find": "| `docs/repositories.md` | Why this repository holds no list of the repositories that were created from it, and where the owner keeps that list |\n",
         "replace": "",
         "count": 1
       },
@@ -63,10 +67,64 @@
         "find": "\n# The two npm commands of the boilerplate (cli/): their targets are in\n# cli/cli.mk, and \"make check\" runs them. A monorepo that was created from the\n# boilerplate has no cli/ folder; this line then includes nothing.\n-include cli/cli.mk\n",
         "replace": "",
         "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `LICENSE` | The license of this repository: MIT |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "\n## License\n\nMIT. The full text is in the file [LICENSE](LICENSE). You may copy, change and use this repository, also in a product that you sell. The one condition: keep the copyright notice and the license text in your copy.\n\nA monorepo that you create with `npx create-toraline-monorepo` is your own project. It does not get this file: you choose its license yourself.\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "package.json",
+        "find": "  \"license\": \"MIT\",\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "package-lock.json",
+        "find": "      \"version\": \"0.0.0\",\n      \"license\": \"MIT\",\n      \"workspaces\": [\n",
+        "replace": "      \"version\": \"0.0.0\",\n      \"workspaces\": [\n",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "The test `cli/shared/src/worktree-port.test.ts` (part of `make check`) runs the script in a temporary repository for these cases: main checkout on 5432, main checkout on another port, port in use by another program, a second run.\n\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `SECURITY.md`, `CONTRIBUTING.md` | How to report a vulnerability in private, and how to report a bug or propose a change |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `docs/images/` | The 2 pictures at the top of this file |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "\n## Security and contributions\n\nTo report a vulnerability in private: [SECURITY.md](SECURITY.md). To report a bug or propose a change: [CONTRIBUTING.md](CONTRIBUTING.md).\n",
+        "replace": "",
+        "count": 1
       }
     ]
   },
   "project": {
+    "overlays": [
+      {
+        "file": "docs/decisions.md",
+        "from": "boilerplate/new-project/docs/decisions.md"
+      }
+    ],
     "replace": [
       {
         "file": "package.json",
@@ -111,14 +169,8 @@
         "count": 1
       },
       {
-        "file": "README.md",
-        "find": "git clone git@github.com:Toraline/monorepo-boilerplate.git\ncd monorepo-boilerplate\n",
-        "replace": "git clone git@github.com:{{owner}}/{{name}}.git\ncd {{name}}\n",
-        "count": 1
-      },
-      {
         "file": "docs/setup-guide.md",
-        "find": "git clone git@github.com:Toraline/monorepo-boilerplate.git\n",
+        "find": "git clone https://github.com/Toraline/monorepo-boilerplate.git\n",
         "replace": "git clone git@github.com:{{owner}}/{{name}}.git\n",
         "count": 1
       },
@@ -181,6 +233,84 @@
         "find": "Administração da lista de tarefas",
         "replace": "Administração de {{name}}",
         "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "A starting point for a new web product: one repository with a Django server, two Next.js web apps, a component catalog, tests, and a fixed way of working with AI coding agents (Claude Code and Cursor). One command copies it into a project of your own, and a second command brings the later improvements of the boilerplate into that project.\n\n**Why it exists.** A new product needs the same things before its first feature: a login, a database, tests, an automatic check, and rules for the AI agents that write the code. Setting them up takes days, and each project does it a little differently. Here they are set up once, tested, and kept up to date. Toraline, the GitHub organization that also publishes the component library `@toraline.tech/ui`, starts its own projects from it.\n\n| The public web app (`apps/web`) | The internal app for admins (`apps/internal`) |\n|---|---|\n| ![The todo list of a sample user in the public web app](docs/images/web-app.png) | ![The todos of all sample users in the internal app](docs/images/internal-app.png) |\n\nThe pictures show the sample product with invented sample data.\n\n",
+        "replace": "_Write 2 sentences here: what {{name}} is, and who uses it._\n\nThis monorepo was created from the Toraline monorepo boilerplate (`Toraline/monorepo-boilerplate` on GitHub) with `npx create-toraline-monorepo`.\n\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| Two commands | `npx create-toraline-monorepo` starts a project. `npx update-toraline-monorepo`, run later inside that project, applies what the boilerplate changed since then and writes a plan for an AI agent, which does the rest |\n",
+        "replace": "| Updates | `npx update-toraline-monorepo`, run inside this folder, applies what the boilerplate changed since this monorepo was created and writes a plan for an AI agent, which does the rest: [docs/update-a-monorepo.md](docs/update-a-monorepo.md) |\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "## Try it\n\nYou need git, Node 24, Python 3.13 and Docker Desktop, which must be running. Linear, Claude Code and Cursor are optional: only the way of working with AI agents uses them.\n\nStart a project of your own:\n\n```bash\nnpx create-toraline-monorepo my-project\ncd my-project\nmake setup\nmake run\n```\n\nOr run the boilerplate as it is:\n\n```bash\ngit clone https://github.com/Toraline/monorepo-boilerplate.git\ncd monorepo-boilerplate\nmake setup\nmake run\n```\n\nThen open `http://localhost:3000` and log in with the values of `SEED_ADMIN_EMAIL` and `SEED_ADMIN_PASSWORD` of the file `.env`. Both are invented sample values. `make seed-sample` adds 2 sample users with todos. Ctrl+C stops the apps, and `make db-down` stops the database.\n\n",
+        "replace": "## Start\n\n```bash\ngit clone git@github.com:{{owner}}/{{name}}.git\ncd {{name}}\nmake setup\n```\n\nDocker Desktop must be running before `make setup`: it starts the database. Node 24 and Python 3.13 must be installed.\n\nThen read [docs/setup-guide.md](docs/setup-guide.md). In Claude Code or Cursor, type `/start`. The steps that a person does after the create command are in [docs/start-a-new-monorepo.md](docs/start-a-new-monorepo.md).\n\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `docs/start-a-new-monorepo.md` | How to start your own monorepo from this repository: the command, or 11 steps by hand |",
+        "replace": "| `docs/start-a-new-monorepo.md` | The guide that this monorepo was started with: what is done, and the steps that a person does next |",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `docs/update-a-monorepo.md` | How a monorepo gets the later changes of the boilerplate: the command `update-toraline-monorepo` and the skill `/update-boilerplate` |",
+        "replace": "| `docs/update-a-monorepo.md` | How this monorepo gets the later changes of the boilerplate: the command `update-toraline-monorepo` and the skill `/update-boilerplate` |",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "## Use the core in another project\n\n```bash\nbash ~/code/repos/monorepo-boilerplate/scripts/sync-skills.sh /path/to/your/project\n```\n\nThe steps are in the setup guide.\n",
+        "replace": "## Get a newer core from the boilerplate\n\nThe core is the way of working with AI agents: the folders `agent/rules`, `agent/skills` and `agent/templates`, and the core scripts.\n\n```bash\nmake sync-skills\n```\n\nIt copies the core from a local copy of the boilerplate in `~/code/repos/monorepo-boilerplate`. Another folder: set the variable `BOILERPLATE_DIR`. The command `npx update-toraline-monorepo` needs no local copy.\n",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "The public starting point for Toraline monorepos. It is generic on purpose, and it never contains real keys or real data. It has two parts:",
+        "replace": "_Write 2 sentences here: what {{name}} is, and who uses it._\n\nThis monorepo was created from the Toraline monorepo boilerplate. It never contains real keys or real data. It has two parts:",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "make sync-skills # in other projects: copy the current core from this repository",
+        "replace": "make sync-skills # copy the current core from a local copy of the boilerplate into this project",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "A new project that starts from this repository: [docs/start-a-new-monorepo.md](docs/start-a-new-monorepo.md). The later changes of the boilerplate, for a project that was created from it: [docs/update-a-monorepo.md](docs/update-a-monorepo.md).",
+        "replace": "The guide that this monorepo was started with: [docs/start-a-new-monorepo.md](docs/start-a-new-monorepo.md). The later changes of the boilerplate: [docs/update-a-monorepo.md](docs/update-a-monorepo.md).",
+        "count": 1
+      },
+      {
+        "file": "e2e/README.md",
+        "find": "with the sample values it is `todo_e2e`",
+        "replace": "with the sample values it is `{{databaseName}}_e2e`",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "It worked when: the page shows the title \"Todo list admin\"",
+        "replace": "It worked when: the page shows the title \"{{name}} admin\"",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "1. [docs/start-a-new-monorepo.md](docs/start-a-new-monorepo.md): from an empty folder to a running project of your own.\n",
+        "replace": "1. [docs/start-a-new-monorepo.md](docs/start-a-new-monorepo.md): the guide that this monorepo was started with, and the steps that a person does next.\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "5. [docs/update-a-monorepo.md](docs/update-a-monorepo.md): how a project gets the later changes of the boilerplate.\n",
+        "replace": "5. [docs/update-a-monorepo.md](docs/update-a-monorepo.md): how this monorepo gets the later changes of the boilerplate.\n",
+        "count": 1
       }
     ],
     "json": [
@@ -227,6 +357,31 @@
         "file": "apps/web/src/app/(app)/page.test.tsx",
         "from": "boilerplate/without-sample/apps/web/src/app/(app)/page.test.tsx",
         "originalSha256": "cacf3ff50f4fcdc539b95b688e42d3fbc3eb1f1876accd32e351d5bcc8bec599"
+      },
+      {
+        "file": "apps/api/README.md",
+        "from": "boilerplate/without-sample/apps/api/README.md",
+        "originalSha256": "ca4350c2c3fc7f0309be3c6a6193c06f199fad25d7d098398f27c0c8ec1c4a83"
+      },
+      {
+        "file": "apps/web/README.md",
+        "from": "boilerplate/without-sample/apps/web/README.md",
+        "originalSha256": "ff766589cf33f950b699fddd0bd63fceef3ff4b4c036775d13f4cc8b1dc1728c"
+      },
+      {
+        "file": "apps/internal/README.md",
+        "from": "boilerplate/without-sample/apps/internal/README.md",
+        "originalSha256": "29942830222891b69c9c13b28bbc95bcabf9d3d06080351ca6f3cbfd3365f436"
+      },
+      {
+        "file": "e2e/README.md",
+        "from": "boilerplate/without-sample/e2e/README.md",
+        "originalSha256": "c8e5a470015da9b259b2a7b8ff2a37c7780be59ed4f478d08eb6bb097622c25d"
+      },
+      {
+        "file": "docs/start-a-new-monorepo.md",
+        "from": "boilerplate/without-sample/docs/start-a-new-monorepo.md",
+        "originalSha256": "8dc07ffeda56931541ef556bc6fceef6b98c6a3e933a8b39f8796d6c39cddacb"
       }
     ],
     "delete": [
@@ -353,6 +508,162 @@
         "file": "e2e/tests/login.spec.ts",
         "find": "a user logs in and sees their todo list",
         "replace": "a user logs in and sees the start page",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| A small sample product | A todo list with tags and a history of changes. A user manages their todos in the web app; an admin manages the tags and sees the todos of all users in the internal app. You keep it as a model, or the create command removes it |\n",
+        "replace": "| Three apps with a login and no product yet | A user logs in to the web app and sees a start page. An admin logs in to the internal app. Your own product goes into them |\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `e2e/` | The 2 end-to-end tests. [e2e/README.md](e2e/README.md) says how to run them and how to add a test |",
+        "replace": "| `e2e/` | The end-to-end test of the login. [e2e/README.md](e2e/README.md) says how to run it and how to add a test |",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `docs/workflow/` | The flow, where things live, the skill catalog, the model for a new module |",
+        "replace": "| `docs/workflow/` | The flow, where things live, the skill catalog |",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": " The apps hold a small sample product, a todo list.",
+        "replace": " The apps have the login, the users, 2 languages and the theme, and no product page yet.",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "make seed-sample # optional: create 2 invented sample users with tags, todos and history; local mode only; safe to run again\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "make e2e         # the 2 end-to-end tests in a real browser (e2e/); not part of make check; GitHub runs both",
+        "replace": "make e2e         # the end-to-end test of the login in a real browser (e2e/); not part of make check; GitHub runs both",
+        "count": 1
+      },
+      {
+        "file": "apps/README.md",
+        "find": "| Exists: the login and the todo list of a user, with tags and filters |",
+        "replace": "| Exists: the login and a start page |",
+        "count": 1
+      },
+      {
+        "file": "apps/README.md",
+        "find": "| Exists: the login for admins only, the tags, the todos of all users, the history |",
+        "replace": "| Exists: the login for admins only, the menu and a start page |",
+        "count": 1
+      },
+      {
+        "file": "docs/workflow/working-pattern.md",
+        "find": " In this repository the model is the todo product: [module-model.md](module-model.md).",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "docs/theme.md",
+        "find": "`Dialog`, `SelectField`, `Pagination`, `TagBadge`, `StateMessage` and `LoginForm`",
+        "replace": "`Dialog`, `SelectField`, `Pagination`, `StateMessage` and `LoginForm`",
+        "count": 1
+      },
+      {
+        "file": "packages/ui/README.md",
+        "find": " `TagBadge`, one tag as a dot in its color and its name;",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "packages/ui/README.md",
+        "find": "(`LoginForm`, `StateMessage`, `Dialog`, `Pagination`, `TagBadge`, `SelectField`)",
+        "replace": "(`LoginForm`, `StateMessage`, `Dialog`, `Pagination`, `SelectField`)",
+        "count": 1
+      },
+      {
+        "file": "apps/ui-catalog/README.md",
+        "find": "Dialog, LoginForm, Pagination, SelectField, StateMessage, TagBadge, ThemeToggle",
+        "replace": "Dialog, LoginForm, Pagination, SelectField, StateMessage, ThemeToggle",
+        "count": 1
+      },
+      {
+        "file": "apps/ui-catalog/README.md",
+        "find": "Copy `stories/project/TagBadge.stories.tsx` as a start.",
+        "replace": "Copy `stories/project/StateMessage.stories.tsx` as a start.",
+        "count": 1
+      },
+      {
+        "file": "apps/ui-catalog/README.md",
+        "find": "| **Project / TagBadge / Several** | 3 tags, page background `rgb(241, 243, 246)`, tag text `rgb(16, 24, 40)`, font Inter | Page background `rgb(12, 17, 29)`, tag text `rgb(245, 245, 246)` |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "- **Web apps**: the two sites of the sample product, written with Next.js.",
+        "replace": "- **Web apps**: the two sites of this project, written with Next.js.",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": " `apps/web` has the login page and the todo list of the user. `apps/internal` has the login page for admins only and 3 areas: the tags, the todos of all users, the history of changes.",
+        "replace": " `apps/web` has the login page and a start page. `apps/internal` has the login page for admins only, a menu and a start page.",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": " `make seed-sample` is optional: it creates invented sample users, tags and todos.\n- **Todo**: one thing that a user wants to do. The sample product is a todo list.\n- **Tag**: a label with a name and a color that users put on their todos.\n",
+        "replace": "\n",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": " It worked when: the page shows the title \"Your todos\", the text \"You have no todos yet.\" and, at the top right, \"Logged in as Sample Admin\" and the button \"Log out\". Click \"New todo\", type a title and click \"Save\". It worked when: the list shows the todo. To see a list with rows at once, run `make seed-sample` and log in as `ana.lima@example.com` with the password of the line `SEED_SAMPLE_PASSWORD` of `.env`.\n",
+        "replace": " It worked when: the page shows the title \"Start page\" and, at the top right, \"Logged in as Sample Admin\" and the button \"Log out\".\n",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": " and the menu \"Tags\", \"Todos\", \"History\". \"Tags\" is where an admin creates, renames, recolors and deletes the tags; \"Todos\" shows the todos of all users with 3 filters; \"History\" shows every change of a todo, newest first. A user who is not an admin, for example `ana.lima@example.com`, sees the page",
+        "replace": " and the menu \"Start\". A user who is not an admin sees the page",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "### Sample data (optional)\n\nAfter step 7 you can fill the database with invented sample rows: 2 users, 3 tags and 9 todos with the history of their changes. It is optional, and `make setup` does not run it. The database must be running.\n\n```bash\nmake seed-sample\n```\n\nIt worked when: the output has the line `Todos: 9 created, 0 already existed.` It is safe to run again: the second run prints `Todos: 0 created, 9 already existed.`\n\nThe 2 sample users are `ana.lima@example.com` and `bruno.reis@example.com`. They are not admins. Their password is the value of the line `SEED_SAMPLE_PASSWORD` of `.env`; the sample that `.env.example` gives is `sample-user-password-for-local-use`.\n\nIf the output has the line `SEED_SAMPLE_PASSWORD is not set.`: your `.env` is older than this command. Copy the line that starts with `SEED_SAMPLE_PASSWORD=` from `.env.example` into `.env`, then run the command again.\n\nThe command refuses to run when `DJANGO_DEBUG` is not `True` in `.env`.\n\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "| `make seed-sample` | Optional. Creates invented sample users, tags and todos. Safe to run again. Only when `DJANGO_DEBUG` is `True` |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "| `make e2e` | Runs the 2 end-to-end tests:",
+        "replace": "| `make e2e` | Runs the end-to-end test of the login:",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "; the todo list in the server: todos, tags, the history of the changes, the requests for an admin, and the optional seed of sample data; the web app `apps/web` (login, the todo list of a user, tags, filters) and the internal app `apps/internal` (login for admins only, the tags, the todos of all users, the history), in English",
+        "replace": "; the web app `apps/web` (login, a start page) and the internal app `apps/internal` (login for admins only, a menu, a start page), in English",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "; the 2 end-to-end tests and `make e2e`;",
+        "replace": "; the end-to-end test of the login and `make e2e`;",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": " `make seed-sample` does not run at all.\n",
+        "replace": "\n",
         "count": 1
       }
     ],

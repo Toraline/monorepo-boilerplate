@@ -43,10 +43,11 @@ With `--source .` the command copies what is committed in this checkout, at the 
 | File | Content |
 |---|---|
 | `boilerplate/create-manifest.json` | What `create-toraline-monorepo` changes in a copy: the files of the boilerplate itself to remove, the lines that hold the name of the project, and the files and lines of the sample product. It is part of the template, so it always fits the files of its own release |
-| `boilerplate/without-sample/` | The files that replace a file of the sample product when it is removed |
+| `boilerplate/without-sample/` | The files that replace a file when the sample product is removed: 2 files of the start page, and 5 documents (`apps/api/README.md`, `apps/web/README.md`, `apps/internal/README.md`, `e2e/README.md`, `docs/start-a-new-monorepo.md`) in a version that does not describe the sample product |
+| `boilerplate/new-project/` | The files that replace a file in every new monorepo, with and without the sample product: `docs/decisions.md`, an empty list for the decisions of the new project. The decision log of the boilerplate is not copied |
 | `boilerplate/VERSION`, `boilerplate/updates/` | The version and the updates files: [docs/boilerplate-version.md](../docs/boilerplate-version.md) |
-| `cli/scripts/build.mjs` | The build (esbuild): one file per command, with no dependency at run time |
-| `cli/scripts/check-packed.mjs` | Stops when a package would hold a file other than `README.md`, `package.json` and `dist/index.js`, a personal path or an email address |
+| `cli/scripts/build.mjs` | The build (esbuild): one file per command, with no dependency at run time. It also copies the file `LICENSE` of the repository root into each package; git ignores the 2 copies |
+| `cli/scripts/check-packed.mjs` | Stops when a package would hold a file other than `LICENSE`, `README.md`, `package.json` and `dist/index.js`, when its `LICENSE` differs from the one of the repository root, when `"license"` is not `"MIT"`, or when a file holds a personal path or an email address |
 
 ## When you change a file that the manifest names
 
@@ -55,9 +56,20 @@ With `--source .` the command copies what is committed in this checkout, at the 
 - a line that the manifest replaces is not in its file the expected number of times;
 - a file that the manifest deletes does not exist;
 - a TypeScript file of the result imports a file that does not exist;
-- a file that an overlay of `boilerplate/without-sample/` replaces has changed (the manifest holds its SHA-256).
+- a file that an overlay of `boilerplate/without-sample/` replaces has changed (the manifest holds its SHA-256);
+- a document of the result without the sample product still names it: a line of a Markdown file outside `agent/` holds "todo", `TagBadge` or `seed-sample`;
+- a link of a document of the result names a file that does not exist;
+- `README.md` or `AGENTS.md` of the result holds a text that is only about the boilerplate itself, or has no line for the 2 sentences of the new project;
+- the result holds the decision log of the boilerplate, or its files `LICENSE`, `SECURITY.md` or `CONTRIBUTING.md`.
 
-The message names the file. Correct `boilerplate/create-manifest.json`, then run the test again. This test does not run `make check` inside the result. After a change of the sample product, run the command once for real and run `make setup` and `make check` in the new folder.
+The message names the file. Correct `boilerplate/create-manifest.json`, then run the test again.
+
+When you change one of the 5 documents that have an overlay with a SHA-256 (the 5 documents of `boilerplate/without-sample/` above):
+
+1. Make the same change in the file of the same path under `boilerplate/without-sample/`, when the change is not about the sample product.
+2. Write the new SHA-256 of the changed document into `originalSha256` of its overlay in `boilerplate/create-manifest.json`. This prints it: `shasum -a 256 apps/api/README.md`
+
+When you add a sentence about the sample product to another document: add an entry to the list `replace` of the group `sampleProduct` that removes or changes it. This test does not run `make check` inside the result. After a change of the sample product, run the command once for real and run `make setup` and `make check` in the new folder.
 
 ## Publishing
 

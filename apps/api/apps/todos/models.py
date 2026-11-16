@@ -6,6 +6,8 @@ from django.db.models.functions import Lower
 TITLE_MAX_LENGTH = 200
 DESCRIPTION_MAX_LENGTH = 2000
 TAG_NAME_MAX_LENGTH = 50
+# How many tags one request may put on a todo.
+TAG_IDS_MAX_LENGTH = 50
 
 TAG_NAME_TAKEN = "A tag with this name already exists."
 

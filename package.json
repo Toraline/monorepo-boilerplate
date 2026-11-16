@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "description": "Root of the npm workspace. Run every command through the Makefile.",
+  "license": "MIT",
   "engines": {
     "node": ">=24"
   },

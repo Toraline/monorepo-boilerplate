@@ -6,7 +6,7 @@ The components of the component library are not here. An app imports them from `
 
 ## Context you need before reading
 
-- **Component library**: the npm packages `@toraline.tech/ui` (the components) and `@toraline.tech/tokens` (the tokens and the function that builds a theme), version `0.3.0`.
+- **Component library**: the npm packages `@toraline.tech/ui` (the components) and `@toraline.tech/tokens` (the tokens and the function that builds a theme), version `0.3.1`.
 - **Token**: a named value of the design, stored as a CSS variable, for example `--bg-primary`.
 - **Theme**: one set of values for the tokens. This project has `light` and `dark`.
 - **Cookie**: a small value that the browser keeps and sends to the server with every request. The cookie `toraline-theme` holds the chosen theme.

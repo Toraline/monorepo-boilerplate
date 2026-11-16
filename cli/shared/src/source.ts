@@ -2,7 +2,7 @@ import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 
 import { CommandError } from "./errors";
-import { lastLine, runGit } from "./git";
+import { lastLine, refuseOptionValue, runGit } from "./git";
 import { sortVersions, versionOfTag } from "./versions";
 
 /** The environment variable that names another place to get the boilerplate from. */
@@ -10,8 +10,8 @@ export const SOURCE_ENVIRONMENT_VARIABLE = "TORALINE_BOILERPLATE_SOURCE";
 
 /**
  * Where the boilerplate is, when no flag and no environment variable names
- * another place. The first address uses the login of the GitHub CLI or of a
- * credential helper; the second uses an SSH key.
+ * another place. The boilerplate is public, so the first address needs no
+ * login. The second is tried when the first fails, and uses an SSH key.
  */
 export const DEFAULT_SOURCES = [
   "https://github.com/Toraline/monorepo-boilerplate.git",
@@ -27,6 +27,8 @@ export function sourcesToTry(
   if (!chosen) {
     return DEFAULT_SOURCES;
   }
+  const flagName = flagValue === undefined ? SOURCE_ENVIRONMENT_VARIABLE : "--source";
+  refuseOptionValue(flagName, chosen);
   // A folder of this machine is given to git as a full path.
   return [existsSync(chosen) ? resolve(chosen) : chosen];
 }
@@ -38,15 +40,17 @@ export interface ReachableSource {
 }
 
 const SOURCE_HELP =
-  'Check that git can read the boilerplate: "git ls-remote https://github.com/Toraline/monorepo-boilerplate.git". ' +
-  'If it asks for a login or says "not found": run "gh auth login", then "gh auth setup-git", and run the command again. ' +
+  'Check that git can read the boilerplate: "git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git" must print one line per release. ' +
+  "The boilerplate is public: it needs the network and no login. " +
   "With no network: give a local copy of the boilerplate with --source <folder>.";
 
 /** Asks each place for its release tags and returns the first place that answers. */
 export function findReachableSource(candidates: string[]): ReachableSource {
   const failures: string[] = [];
   for (const source of candidates) {
-    const result = runGit(["ls-remote", "--tags", "--refs", source]);
+    refuseOptionValue("the source", source);
+    // "--": what follows is an address, never an option of git.
+    const result = runGit(["ls-remote", "--tags", "--refs", "--", source]);
     if (result.status === 0) {
       const versions = result.stdout
         .split("\n")

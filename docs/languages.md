@@ -42,12 +42,12 @@ On a local machine the two apps share the cookie, because both are on `localhost
 
 ## Add a text
 
-Example: a button "Save" in `apps/web`.
+Example: a button "Save" in `apps/web`, in an invented feature with the name `notes`.
 
 1. Open `apps/web/src/i18n/messages/en.json`. Add the key and the English text. Group the keys by feature or page:
 
    ```json
-   "todos": {
+   "notes": {
      "save": "Save"
    }
    ```
@@ -55,7 +55,7 @@ Example: a button "Save" in `apps/web`.
 2. Open `apps/web/src/i18n/messages/pt-BR.json`. Add the same key with the Portuguese text:
 
    ```json
-   "todos": {
+   "notes": {
      "save": "Salvar"
    }
    ```
@@ -66,12 +66,12 @@ Example: a button "Save" in `apps/web`.
    import { useTranslations } from "next-intl";
 
    export function SaveButton() {
-     const t = useTranslations("todos");
+     const t = useTranslations("notes");
      return <button type="submit">{t("save")}</button>;
    }
    ```
 
-   `useTranslations` works in a Server Component and in a Client Component. In an `async` Server Component, use `const t = await getTranslations("todos")` from `next-intl/server`.
+   `useTranslations` works in a Server Component and in a Client Component. In an `async` Server Component, use `const t = await getTranslations("notes")` from `next-intl/server`.
 
 4. A text with a value in it uses braces in the messages file, and the value is the second argument:
 
@@ -136,5 +136,5 @@ Nothing else changes. The language switch shows a third button. A browser that a
 ## Status
 
 - **Done:** English and Portuguese (Brazil) in both apps, also for every text of the product screens, the language switch, the cookie, the choice of the language on a first visit, the three checks. A date is written in the format of the language (`apps/internal/src/lib/format/use-date-time-format.ts`).
-- **Not done:** the page that Next.js shows when the app itself fails has no translation; it is the page of Next.js. The names of the tags and the texts of the todos are data that people type: they are not translated.
+- **Not done:** the page that Next.js shows when the app itself fails has no translation; it is the page of Next.js. Data that people type, for example a title or a name, is not translated.
 - **What you must do:** nothing to set up. Follow "Add a text" for each new text.

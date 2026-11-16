@@ -5,6 +5,7 @@ from apps.accounts.serializers import UserSummarySerializer
 from . import selectors
 from .models import (
     DESCRIPTION_MAX_LENGTH,
+    TAG_IDS_MAX_LENGTH,
     TAG_NAME_TAKEN,
     TITLE_MAX_LENGTH,
     HistoryEntry,
@@ -61,7 +62,12 @@ class TodoWriteSerializer(serializers.Serializer):
         max_length=DESCRIPTION_MAX_LENGTH, required=False, allow_blank=True
     )
     # The ids of the tags of the todo. The validated value is the list of the tags.
-    tagIds = serializers.ListField(child=serializers.IntegerField(), required=False, source="tags")
+    tagIds = serializers.ListField(
+        child=serializers.IntegerField(),
+        required=False,
+        source="tags",
+        max_length=TAG_IDS_MAX_LENGTH,
+    )
 
     def validate_tagIds(self, tag_ids):
         tags = list(selectors.tags_with_ids(tag_ids))

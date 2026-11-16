@@ -17,10 +17,10 @@ The steps to release a new version of the boilerplate: publish the two packages 
 
 ## One-time setup
 
-Do this once, before the first release. Only a person with the npm account that will own the two packages can do it.
+This was done for the first release. Do it again when the token ends or must be replaced. Only a person with the npm account that owns the two packages can do it.
 
 1. Sign in on https://www.npmjs.com with that account.
-2. Create an access token: your picture > **Access Tokens** > **Generate New Token** > **Granular Access Token**. Give it **Read and write** permission for packages. For the first release the two packages do not exist yet, so the token must be allowed to create packages ("All packages"). Copy the token. npm shows it once.
+2. Create an access token: your picture > **Access Tokens** > **Generate New Token** > **Granular Access Token**. Give it **Read and write** permission for 2 packages only: `create-toraline-monorepo` and `update-toraline-monorepo`. Do not choose "All packages": a token that leaks could then publish every package of the account. Give it an end date. Copy the token. npm shows it once.
 3. On GitHub, open the repository `Toraline/monorepo-boilerplate` > **Settings** > **Secrets and variables** > **Actions** > **New repository secret**.
 4. Name: `NPM_PUBLISH_TOKEN`. Secret: paste the token. Press **Add secret**.
 
@@ -39,15 +39,13 @@ The examples use `0.2.0` as the new version.
    | A fix, or new updates that break no monorepo | `0.1.0` becomes `0.1.1` |
    | A change that a monorepo must act on, or a change of the format of the record file, of the updates files or of the manifest | `0.1.1` becomes `0.2.0` |
 
-   The first release needs no new number: the files already say `0.1.0`. Skip steps 2 and 3 for it, and check only that the key `date` of `boilerplate/updates/0.1.0.json` is the day of the release.
-
 2. **Start a ticket and its worktree**, as for any change (`make worktree TICKET=<n> SLUG=release-<version>`). Step 3 happens there.
 
 3. **Write the version and the updates file.**
    1. Write the new version into `boilerplate/VERSION`.
    2. Write the same version into `"version"` of `cli/create-toraline-monorepo/package.json` and of `cli/update-toraline-monorepo/package.json`. Then run `npm install --package-lock-only` in the folder `cli`, so that `cli/package-lock.json` has the new version.
-   3. Create `boilerplate/updates/0.2.0.json`: one update for each thing that a monorepo can take from this release. The format and an example: [boilerplate-version.md](boilerplate-version.md). The key `coreVersion` is the value of `agent/CORE_VERSION`.
-   4. Run `make check`. It must end with `Check passed.` It fails when the version file, the newest updates file and the versions of the two packages do not agree, and when a package would hold a file that it must not hold. Near the end it prints the files of each package: each has exactly `README.md`, `dist/index.js` and `package.json`.
+   3. Create `boilerplate/updates/0.2.0.json`: one update for each thing that a monorepo can take from this release. The format and an example: [boilerplate-version.md](boilerplate-version.md). The key `coreVersion` is the value of `agent/CORE_VERSION`. The key `date` is the day of the release: correct it when the release happens on a later day. Never change the updates file of a version that is already published: `make check` compares only the newest file with `agent/CORE_VERSION`.
+   4. Run `make check`. It must end with `Check passed.` It fails when the version file, the newest updates file and the versions of the two packages do not agree, and when a package would hold a file that it must not hold. Near the end it prints the files of each package: each has exactly `LICENSE`, `README.md`, `dist/index.js` and `package.json`.
 
 4. **Commit, open the pull request to `main`, and merge it** after `check` passes on GitHub. From here on the branch `main` has the version.
 
@@ -66,7 +64,7 @@ The examples use `0.2.0` as the new version.
    npm view create-toraline-monorepo@0.2.0 version
    npm view update-toraline-monorepo@0.2.0 version
    npm view create-toraline-monorepo dist-tags
-   git ls-remote --tags git@github.com:Toraline/monorepo-boilerplate.git v0.2.0
+   git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git v0.2.0
    ```
 
    - npm needs some minutes after a publish. Until then the first two commands answer `404 Not Found`. The workflow waits up to 10 minutes for the same reason.
@@ -75,7 +73,7 @@ The examples use `0.2.0` as the new version.
 
    Then try the commands: `npx create-toraline-monorepo --version` prints the version, and `npx create-toraline-monorepo my-test --yes` in an empty folder creates a monorepo.
 
-7. **Tell the repositories that use the boilerplate.** The list is [repositories.md](repositories.md). In each of them a person or an agent runs `npx update-toraline-monorepo`.
+7. **Update the repositories that use the boilerplate.** The owner keeps their list outside this repository ([repositories.md](repositories.md) says why and what it holds). In each of them a person or an agent runs `npx update-toraline-monorepo`.
 
 ## How to undo a wrong release
 
@@ -98,10 +96,13 @@ The rules of npm for removing a version (`npm unpublish`): https://docs.npmjs.co
 
 - It does not run the whole `make check` of the repository, only the checks of `cli/`. The pull request of step 4 ran the whole check.
 - It does not create a "Release" on the GitHub page, only the git tag.
-- It adds no provenance (the signed note of npm that says which workflow built a package). npm gives provenance only to a package that is built from a public repository, and this repository is private today.
+- It adds no provenance (the signed note of npm that says which workflow built a package). npm gives provenance only to a package that is built from a public repository. The first release was built while this repository was private, so the workflow does not ask for it. Not done: turning it on (`npm publish --provenance`, and the permission `id-token: write` in the workflow).
 
 ## Status
 
-- **Done:** the workflow file, the checks of the packed files, this document. The YAML of the workflow was parsed, and its steps were read one by one.
-- **Not done:** the workflow was never run: it runs only on GitHub, from the branch `main`. No package is on npm. No tag `v0.1.0` exists. The two packages have no license.
-- **What you must do:** the one-time setup, then steps 5 and 6 for the first release `0.1.0`. Decide whether the packages get a license.
+- **Done:** the workflow file, the checks of the packed files, this document. The two packages have the MIT license: `"license": "MIT"` in each `package.json`, and the file `LICENSE` in each packed package. The YAML of the workflow was parsed, and its steps were read one by one.
+- **Done:** the first release. The workflow ran on 2026-11-16 for version `0.1.0`: both packages are on npm with that version, and the tag `v0.1.0` exists.
+- **Not done:** provenance (see above).
+- **On 2026-11-16:** `0.1.0` is published. `0.1.1` is prepared in the files and is not published.
+- **How to see which version is published:** `npm view create-toraline-monorepo version` prints the newest version on npm. The file `boilerplate/VERSION` on the branch `main` holds the version of the files. When the two differ, the version of the file is prepared and not published.
+- **What you must do:** for each release, steps 1 to 7. For a version that is already prepared in the files, start at step 4.

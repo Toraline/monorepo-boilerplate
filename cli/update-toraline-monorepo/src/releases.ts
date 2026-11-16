@@ -1,5 +1,5 @@
 import { CommandError } from "../../shared/src/errors";
-import { fileAtReference, gitOutput, runGit } from "../../shared/src/git";
+import { fileAtReference, gitOutput, refuseOptionValue, runGit } from "../../shared/src/git";
 import type { MonorepoRecord } from "../../shared/src/record";
 import { SOURCE_HELP } from "../../shared/src/source";
 import {
@@ -28,7 +28,9 @@ export function fetchReleases(rootDirectory: string, source: string, versions: s
     return;
   }
   const referencePairs = versions.map((version) => `+refs/tags/${releaseTag(version)}:${referenceOf(version)}`);
-  gitOutput(["fetch", "--quiet", "--no-tags", source, ...referencePairs], rootDirectory, SOURCE_HELP);
+  refuseOptionValue("the source", source);
+  // "--": what follows is the address and the tags, never an option of git.
+  gitOutput(["fetch", "--quiet", "--no-tags", "--", source, ...referencePairs], rootDirectory, SOURCE_HELP);
 }
 
 /** Deletes every reference that the command fetched. The branches and the files of the monorepo do not change. */

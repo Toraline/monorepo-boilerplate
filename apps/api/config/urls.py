@@ -8,9 +8,13 @@ from django.contrib import admin
 from django.urls import include, path
 
 from apps.accounts import urls as accounts_urls
+from apps.core.throttling import admin_login
 from apps.todos import urls as todos_urls
 
 urlpatterns = [
+    # The login page of the Django admin, with the limit on login attempts.
+    # It must be above admin.site.urls, which has the same address without the limit.
+    path("admin/login/", admin_login),
     path("admin/", admin.site.urls),
     path("api/", include("apps.core.urls")),
     path("api/auth/", include("apps.accounts.urls")),
