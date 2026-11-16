@@ -245,6 +245,21 @@ A project with no license file is not open source: nobody else may copy its code
 
    It worked when: `git status` prints `Your branch is up to date with 'origin/main'`.
 
+5. Protect the branch `main` on GitHub. Do it right after point 4:
+
+   ```bash
+   make protect-main
+   ```
+
+   It prints the rule and asks `Create it now? Type yes:`. With `yes` it creates one ruleset with the name `protect-main` in the settings of the repository on GitHub. The ruleset has 4 rules for `main`: a change needs a pull request (no approval is required, so you can work alone); the check `check` must pass before the merge; no force push; the branch cannot be deleted.
+
+   It worked when: the output has the line `Created the ruleset "protect-main" in my-owner/my-project.`
+
+   - It needs the `gh` command, logged in as an admin of the repository.
+   - When it says that the plan does not allow rulesets on a private repository: GitHub gives rulesets to a private repository only with a paid plan. Make the repository public, change the plan, or leave `main` without the rule.
+   - To do it later, run the same command. A second run changes nothing: it prints `my-owner/my-project already has a ruleset named "protect-main". Nothing was changed.`
+   - The skill `/start` asks the same question once, "Protect the branch main now?", when the repository is on GitHub and has no ruleset.
+
 From now on, `main_checkout` is `protected`: the agent makes no change in this folder. Each ticket gets a worktree, a branch and a pull request. Each pull request to `main` runs `make check` and `make e2e` on GitHub; it needs no key and no setting.
 
 ## Step 11. Start working

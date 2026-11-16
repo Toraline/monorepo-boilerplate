@@ -76,7 +76,7 @@ monorepo-boilerplate/
 │   ├── skills/        the skills
 │   ├── rules/         writing, git safety, ask-first
 │   └── templates/     templates for a new skill and for a project's AGENTS.md
-├── scripts/           worktree, doctor, sync, guard, secret check, database, server install
+├── scripts/           worktree, doctor, sync, guard, secret check, protect main, database, server install
 ├── .github/workflows/ the automatic check on GitHub: make check, then make e2e, on each pull request to main
 ├── docs/              the guides to start and to update a monorepo, the setup guide, the decisions, the workflow
 ├── AGENTS.md          entry file for agents, with the project profile
@@ -97,8 +97,8 @@ monorepo-boilerplate/
 | `packages/` | The code that the apps share. [packages/README.md](packages/README.md) lists the packages |
 | `e2e/` | The 2 end-to-end tests. [e2e/README.md](e2e/README.md) says how to run them and how to add a test |
 | `cli/` | The code of the two npm commands. [cli/README.md](cli/README.md) has its commands and how to try a command on your machine |
-| `boilerplate/` | `VERSION` (the version of this boilerplate), `updates/` (one file per release) and `create-manifest.json` (what `create-toraline-monorepo` changes in a copy). [docs/boilerplate-version.md](docs/boilerplate-version.md) |
-| `.github/workflows/release.yml` | The workflow "Release", started by hand: it publishes the two commands to npm and creates the tag of the version. [docs/releasing.md](docs/releasing.md) |
+| `boilerplate/` | `VERSION` (the version of this boilerplate), `updates/` (one file per release) and `create-manifest.json` (what `create-toraline-monorepo` changes in a copy): [docs/boilerplate-version.md](docs/boilerplate-version.md). `public/` (how a release gets into this repository: each release is one commit): [docs/releasing.md](docs/releasing.md) |
+| `.github/workflows/publish.yml` | The workflow "Publish": when the pull request of a release is merged into `main`, it creates the tag of the version and publishes the two commands to npm. [docs/releasing.md](docs/releasing.md) |
 | `docs/repositories.md` | Why this repository holds no list of the repositories that were created from it, and where the owner keeps that list |
 | `LICENSE` | The license of this repository: MIT |
 | `SECURITY.md`, `CONTRIBUTING.md` | How to report a vulnerability in private, and how to report a bug or propose a change |
@@ -115,7 +115,7 @@ monorepo-boilerplate/
 | `agent/skills/` | The skills. `.claude/skills` and `.cursor/skills` are links to this folder |
 | `agent/rules/` | Writing, git safety, ask-first |
 | `agent/templates/` | Templates for a new skill and for a project's `AGENTS.md` |
-| `scripts/` | Worktree, doctor, sync, guard, secret check, the database commands, the install of the server |
+| `scripts/` | Worktree, doctor, sync, guard, secret check, the protection of the branch `main` on GitHub, the database commands, the install of the server |
 | `docs/start-a-new-monorepo.md` | How to start your own monorepo from this repository: the command, or 11 steps by hand |
 | `docs/update-a-monorepo.md` | How a monorepo gets the later changes of the boilerplate: the command `update-toraline-monorepo` and the skill `/update-boilerplate` |
 | `docs/setup-guide.md` | How to set this up on your machine and in your own project |

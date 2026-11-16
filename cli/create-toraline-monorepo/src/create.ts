@@ -239,6 +239,7 @@ export function nextSteps(options: CreateOptions, result: CreateResult, defaulte
     "Open Docker Desktop, then run: make setup",
     "Run the checks: make check   (the last line must be: Check passed.)",
     `Create the repository on GitHub yourself, when you want it: gh repo create ${options.owner}/${options.name} --private --source . --remote origin --push`,
+    "Right after the repository is on GitHub, protect its branch main: make protect-main   (it prints the rule and asks before it creates it: pull request and check required, no force push, no deletion)",
     `In Linear: check that the team with the key ${options.ticketPrefix} exists, and create a project for this repository. The command created nothing in Linear.`,
     'Change the theme, and write 2 sentences about your project in README.md and AGENTS.md, in the place of the line "Write 2 sentences here": steps 2 and 8 of docs/start-a-new-monorepo.md.',
     'Choose the license of your project. The new folder has no file LICENSE: the license of the boilerplate is not copied. When you want one, add a file LICENSE and the line "license" to package.json.',

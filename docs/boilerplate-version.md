@@ -4,7 +4,7 @@ Where the version of this boilerplate is written, how a release says what change
 
 ## Context you need before reading
 
-- **Boilerplate**: this repository, `Toraline/monorepo-boilerplate`.
+- **Boilerplate**: this repository, `Toraline/monorepo-boilerplate`. It is the public repository: it gets one commit per release. The daily work happens in a private development repository ([releasing.md](releasing.md)).
 - **Monorepo**: a repository that was created from the boilerplate with `npx create-toraline-monorepo`.
 - **Version**: three numbers with dots, for example `0.1.0`.
 - **Release**: one version of the boilerplate that monorepos can be created from. A release is the git tag `v` plus the version, for example `v0.1.0`.
@@ -16,7 +16,7 @@ Where the version of this boilerplate is written, how a release says what change
 ## The version
 
 1. The file `boilerplate/VERSION` holds the version. It has one line, for example `0.1.0`.
-2. A release is the git tag with the same number: `v0.1.0`. The workflow "Release" creates the tag ([releasing.md](releasing.md)).
+2. A release is the git tag with the same number, in the public repository: `v0.1.0`. The workflow "Publish" of the public repository creates the tag when the pull request of the release is merged ([releasing.md](releasing.md)).
 3. The two packages in `cli/` have the same version in their `package.json`.
 4. `make check` fails when `boilerplate/VERSION`, the newest updates file and the versions of the two packages do not agree (the test `cli/shared/src/boilerplate.test.ts`).
 
@@ -138,8 +138,10 @@ A repository that was started from the boilerplate before the record file existe
 ## Status
 
 - **Done:** the version file, the updates folder with one file per version, the record file, the test that compares them.
-- **Done:** the first release, `0.1.0`, on 2026-11-16: the tag `v0.1.0` exists and both commands are on npm.
-- **Done:** the second release, `0.1.1`, on 2026-11-16: the tag `v0.1.1` exists and both commands are on npm with that version.
-- **On 2026-11-16:** `0.1.0` and `0.1.1` are published. `0.1.2` is prepared in the files (`boilerplate/VERSION`, `boilerplate/updates/0.1.2.json`, the 2 packages) and is not published.
-- **Not done:** nothing that is planned for this document. A version that is in `boilerplate/VERSION` and has no tag yet is prepared and not published; this prints the published versions: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git`.
+- **Done:** the first release, `0.1.0`, on 2026-11-16: both commands are on npm.
+- **Done:** the second release, `0.1.1`, on 2026-11-16: both commands are on npm with that version.
+- **Done:** the third release, `0.1.2`, on 2026-11-16: both commands are on npm with that version.
+- **Not done on 2026-11-16:** the tags `v0.1.0`, `v0.1.1` and `v0.1.2` are not in the public repository yet. They exist in the development repository and in a prepared seed. The owner pushes the seed ([releasing.md](releasing.md), "One-time setup", part A). Until then the published commands cannot download the boilerplate.
+- **On 2026-11-16:** `0.1.0`, `0.1.1` and `0.1.2` are published. `0.1.2` is the last released version. `0.1.3` is prepared in the files and not published: `boilerplate/updates/0.1.3.json` holds its 3 updates, and its core version is `0.1.11`. `boilerplate/updates/0.1.2.json` is exactly the file of the release `0.1.2`.
+- **Not done:** nothing that is planned for this document. A version that is in `boilerplate/VERSION` and has no tag in the public repository yet is prepared and not published; this prints the released versions: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git`.
 - **What you must do:** nothing for this document. To release: [releasing.md](releasing.md).

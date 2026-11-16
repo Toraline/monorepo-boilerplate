@@ -5,6 +5,7 @@ How to report a bug or propose a change in this repository.
 ## Context you need before reading
 
 - **This repository**: `Toraline/monorepo-boilerplate`, the starting point that Toraline uses for its own projects. It is public so that other people can use it and read it.
+- **How this repository gets its changes**: the daily work happens in a private development repository. Each release arrives here as one commit, through a pull request with the title `Release v<version>`. So the history here has one commit per release.
 - **Issue**: a public note on GitHub about a bug or an idea.
 - **Pull request**: a proposed change to the files, on GitHub.
 
@@ -33,6 +34,7 @@ A vulnerability is not reported in an issue: see [SECURITY.md](SECURITY.md).
    ```
 
 5. Open a pull request to the branch `main`. Say what changed, why, and how you checked it.
+6. Your pull request is not merged here. When the change is accepted, the maintainer applies it in the development repository. It reaches this repository with the next release. Your pull request is then closed, with a comment that names the release.
 
 Rules for a change:
 

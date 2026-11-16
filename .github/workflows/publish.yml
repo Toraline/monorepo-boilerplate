@@ -1,0 +1,235 @@
+# Publishes a release of the boilerplate. This file exists only in the public
+# repository, Toraline/monorepo-boilerplate. In the development repository it
+# is kept in boilerplate/public/overlay/.
+#
+# It runs on every push to the branch main, and never on a pull request. A
+# push to main is the merge of a pull request: the ruleset of main allows
+# nothing else. So a pull request from a fork never starts this workflow and
+# never gets a secret.
+#
+# What it does:
+#   1. Reads the version of boilerplate/VERSION.
+#   2. When the tag v<version> already exists on another commit: nothing. This
+#      is every push that is not a release.
+#   3. When the tag does not exist: it lints, tests and builds the two
+#      commands, creates the tag v<version> on the commit, then publishes
+#      create-toraline-monorepo and update-toraline-monorepo to npm, with
+#      provenance (the signed note of npm that names this workflow and commit).
+#   4. When the tag exists on this same commit and a package is not on npm
+#      yet (an earlier run stopped halfway, and a person started it again):
+#      it publishes what is missing.
+#
+# What the owner sets up once, in the settings of the public repository:
+#   Settings > Secrets and variables > Actions > New repository secret
+#   Name: NPM_PUBLISH_TOKEN
+#   Value: an npm access token that may publish the two packages.
+# The steps for a person are in docs/releasing.md. No token is in any file.
+name: Publish
+
+on:
+  push:
+    branches: [main]
+
+# Two runs never release at the same time.
+concurrency:
+  group: publish
+  cancel-in-progress: false
+
+# What the token of a run may do when a job says nothing else: read the files.
+permissions:
+  contents: read
+
+env:
+  PACKAGES: create-toraline-monorepo update-toraline-monorepo
+
+jobs:
+  decide:
+    name: decide
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    outputs:
+      version: ${{ steps.decide.outputs.version }}
+      release: ${{ steps.decide.outputs.release }}
+    steps:
+      # Each action is named by the full id of a commit, not by a tag. A tag
+      # can be moved to other code; a commit id cannot. The comment after the
+      # id is the version. This prints the commit id of a version:
+      #   gh api repos/actions/checkout/git/ref/tags/v4.4.0 --jq .object.sha
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Decide whether this commit is a new release
+        id: decide
+        run: |
+          version="$(tr -d '[:space:]' < boilerplate/VERSION)"
+          if ! printf '%s' "${version}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::boilerplate/VERSION does not hold a version of three numbers."
+            exit 1
+          fi
+          echo "version=${version}" >> "${GITHUB_OUTPUT}"
+
+          tags="$(git ls-remote --tags --refs origin 'refs/tags/v*')"
+          existing="$(printf '%s\n' "${tags}" | awk -v ref="refs/tags/v${version}" '$2 == ref { print $1 }')"
+
+          if [ -z "${existing}" ]; then
+            newest="$(printf '%s\n' "${tags}" | sed -n 's#.*refs/tags/v\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\)$#\1#p' | sort -t. -k1,1n -k2,2n -k3,3n | tail -n 1)"
+            highest="$(printf '%s\n%s\n' "${newest}" "${version}" | sort -t. -k1,1n -k2,2n -k3,3n | tail -n 1)"
+            if [ -n "${newest}" ] && [ "${highest}" != "${version}" ]; then
+              echo "::error::boilerplate/VERSION says ${version}, which has no tag and is lower than the last release, ${newest}. A release is never older than the one before it. Correct boilerplate/VERSION."
+              exit 1
+            fi
+            echo "The tag v${version} does not exist. The last release: ${newest:-none}. This commit is the release ${version}."
+            echo "release=true" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          if [ "${existing}" != "${GITHUB_SHA}" ]; then
+            echo "The tag v${version} exists on another commit (${existing}): this push is not a release. Nothing to publish."
+            echo "release=false" >> "${GITHUB_OUTPUT}"
+            exit 0
+          fi
+
+          missing=""
+          for name in ${PACKAGES}; do
+            if ! npm view "${name}@${version}" version > /dev/null 2>&1; then
+              missing="${missing} ${name}"
+            fi
+          done
+          if [ -z "${missing}" ]; then
+            echo "The tag v${version} is on this commit and both packages are on npm. The release is complete. Nothing to publish."
+            echo "release=false" >> "${GITHUB_OUTPUT}"
+          else
+            echo "The tag v${version} is on this commit, and npm does not have:${missing}. This run goes on with the release."
+            echo "release=true" >> "${GITHUB_OUTPUT}"
+          fi
+
+  # The checks that the packages are built with. The whole check ("make check"
+  # and "make e2e") ran on the release pull request before the merge: the
+  # ruleset of main requires it.
+  check:
+    name: check the commands
+    needs: decide
+    if: needs.decide.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install the packages that the two commands are built with
+        run: npm ci --no-audit --no-fund
+        working-directory: cli
+
+      # The same three checks as "make check" runs for cli/. The tests also
+      # compare boilerplate/VERSION with the newest updates file and with the
+      # versions of the two packages. They use no network.
+      - name: Lint, test and build the two commands
+        run: make lint-cli test-cli build-cli
+
+  # The tag comes before the packages: a published command downloads the
+  # boilerplate at its newest release tag, so the tag must exist first.
+  tag:
+    name: create the tag
+    needs: [decide, check]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      # "write" lets this job create the git tag of the release. Nothing else is written.
+      contents: write
+    env:
+      VERSION: ${{ needs.decide.outputs.version }}
+    steps:
+      # Before the tag, so that a missing token stops the release before
+      # anything is created. The step only looks whether the value is empty.
+      - name: Stop when the npm token is missing
+        env:
+          NPM_PUBLISH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+        run: |
+          if [ -z "${NPM_PUBLISH_TOKEN}" ]; then
+            echo "::error::The repository secret NPM_PUBLISH_TOKEN is missing or empty. Add it in Settings > Secrets and variables > Actions (docs/releasing.md). Then open this run and press \"Re-run all jobs\"."
+            exit 1
+          fi
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Create the git tag of the release
+        run: |
+          existing="$(git ls-remote --tags --refs origin "refs/tags/v${VERSION}" | cut -f1)"
+          if [ -z "${existing}" ]; then
+            git push origin "${GITHUB_SHA}:refs/tags/v${VERSION}"
+            echo "Created the tag v${VERSION} on ${GITHUB_SHA}."
+          elif [ "${existing}" = "${GITHUB_SHA}" ]; then
+            echo "The tag v${VERSION} already exists on this commit. Kept."
+          else
+            echo "::error::The tag v${VERSION} already exists on another commit (${existing}). A release is never moved."
+            exit 1
+          fi
+
+  publish:
+    name: publish to npm
+    needs: [decide, tag]
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      # Lets npm sign the provenance of the packages: the note that says which
+      # workflow and which commit of this public repository built them.
+      id-token: write
+    env:
+      VERSION: ${{ needs.decide.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+          registry-url: https://registry.npmjs.org
+
+      - name: Install the packages that the two commands are built with
+        run: npm ci --no-audit --no-fund
+        working-directory: cli
+
+      # Builds the two commands and checks the files that each packed package
+      # would hold. The log lists the files of each package.
+      - name: Build the two commands
+        run: make build-cli
+
+      - name: Publish the two packages
+        working-directory: cli
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN }}
+        run: |
+          for name in ${PACKAGES}; do
+            if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
+              echo "${name}@${VERSION} is already on npm. Skipped."
+              continue
+            fi
+            npm publish --workspace "${name}" --access public --provenance
+          done
+
+      - name: Check the result on npm
+        run: |
+          for name in ${PACKAGES}; do
+            # After a publish, npm needs some minutes before it shows a new
+            # version. So ask again every 15 seconds, for up to 10 minutes.
+            for attempt in $(seq 1 40); do
+              if npm view "${name}@${VERSION}" version > /dev/null 2>&1; then
+                break
+              fi
+              echo "${name}@${VERSION} is not on npm yet (try ${attempt} of 40). Waiting 15 seconds."
+              sleep 15
+            done
+            echo "${name}@${VERSION} on npm:"
+            npm view "${name}@${VERSION}" version
+            npm view "${name}" dist-tags
+          done

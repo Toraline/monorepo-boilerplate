@@ -1,0 +1,19 @@
+# The files and folders of the development repository that never go into the
+# public repository. boilerplate/public/make-public-copy.sh reads this list and
+# leaves each entry out of the public copy.
+#
+# One path per line, from the root folder of the repository. A path is a file
+# or a folder; a folder is left out with everything in it. No pattern with "*".
+# A line that starts with # is a comment.
+#
+# The files that exist ONLY in the public repository are in
+# boilerplate/public/overlay/. docs/releasing.md says how a release is made.
+
+# The workflow "Release" of the development repository. It pushes the release
+# branch to the public repository, with a secret that only the development
+# repository has. The public repository has "Publish" in its place.
+.github/workflows/release.yml
+
+# The private notes of each person. git ignores this folder, so it is never in
+# a commit. It is listed here as a second barrier.
+local-docs

@@ -12,7 +12,7 @@ CORE_SKIP_DOCTOR := 1
 # boilerplate has no cli/ folder; this line then includes nothing.
 -include cli/cli.mk
 
-.PHONY: help setup env install doctor run lint test build check e2e \
+.PHONY: help setup env install doctor run lint test build check e2e protect-main \
         db-up db-wait db-down db-ps db-logs db-destroy db-reset \
         install-js install-api run-api run-web run-internal run-ui-catalog \
         api web internal catalog migrate seed seed-sample format-api \
@@ -47,6 +47,13 @@ doctor: ## Check the machine and the project; each failure prints its fix
 	exit $$status
 
 install: install-js install-api ## Install the dependencies of every app and package that exists
+
+# ---- GitHub -----------------------------------------------------------------
+
+# Run it once, right after the repository is on GitHub. It changes a setting of
+# the repository on GitHub, so it prints the rule and asks first.
+protect-main: ## Protect the branch main on GitHub: pull request and check required, no force push, no deletion (asks first; YES=1 asks nothing)
+	@bash scripts/protect-main.sh $(if $(YES),--yes)
 
 # ---- The database (PostgreSQL in Docker, docker-compose.yml) ----------------
 

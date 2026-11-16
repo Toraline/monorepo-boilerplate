@@ -1,0 +1,44 @@
+{
+  "version": "0.1.3",
+  "date": "2026-11-16",
+  "coreVersion": "0.1.11",
+  "updates": [
+    {
+      "id": "0.1.3-core",
+      "title": "The core 0.1.11: the skills /release and /release-prep always say the last released version, and the skill /start asks once whether to protect the branch main",
+      "kind": "core-files",
+      "appliedBy": "program",
+      "files": [
+        "agent/skills/release/SKILL.md",
+        "agent/skills/release-prep/SKILL.md",
+        "agent/skills/start/SKILL.md",
+        "agent/CORE_VERSION",
+        "docs/workflow/skills.md"
+      ],
+      "whatToDo": "Copy the 5 files from the release. When your project has skills of its own, do not copy `docs/workflow/skills.md`: run `make skills-catalog`, which writes it again. The skills `/release` and `/release-prep` now say the last released version of the product wherever they name a version: in one line right after the product is chosen, in the draft, in the release ticket, in the pull request text and in the report. The skill `/start` has a new Part B: when the repository is on GitHub and has no ruleset, it asks once, \"Protect the branch main now?\". It asks only when the file `scripts/protect-main.sh` exists: the update `0.1.3-protect-main` brings that file."
+    },
+    {
+      "id": "0.1.3-protect-main",
+      "title": "A script that protects the branch main on GitHub",
+      "kind": "core-files",
+      "appliedBy": "program",
+      "files": [
+        "scripts/protect-main.sh",
+        "scripts/sync-skills.sh"
+      ],
+      "whatToDo": "Copy the 2 files from the release. `scripts/protect-main.sh` creates one ruleset named `protect-main` on GitHub for the branch `main`: a pull request is required (with no approval), the check of `.github/workflows/check.yml` must pass, no force push, no deletion. It prints the rule and asks before it creates it. Nothing runs by itself: the skill `/start` of the update `0.1.3-core` asks once, \"Protect the branch main now?\", when the repository is on GitHub and has no ruleset. `scripts/sync-skills.sh` now also copies the new script."
+    },
+    {
+      "id": "0.1.3-protect-main-target",
+      "title": "The command make protect-main, and the step that names it in the guides",
+      "kind": "new-feature",
+      "appliedBy": "agent",
+      "files": [
+        "Makefile",
+        "AGENTS.md",
+        "docs/start-a-new-monorepo.md"
+      ],
+      "whatToDo": "Take the update `0.1.3-protect-main` first: it brings `scripts/protect-main.sh`. Then, in `Makefile`: add `protect-main` to the list `.PHONY`, and add this target (the second line starts with a tab): `protect-main: ## Protect the branch main on GitHub: pull request and check required, no force push, no deletion (asks first; YES=1 asks nothing)` and `@bash scripts/protect-main.sh $(if $(YES),--yes)`. In `AGENTS.md`, add one line to the block \"Commands\": `make protect-main # on GitHub: protect the branch main (pull request and check required, no force push, no deletion); it asks first`. In `docs/start-a-new-monorepo.md`, add point 5 of step 10 from the release: run `make protect-main` right after the repository is on GitHub. Then run `make protect-main` once, when the repository is on GitHub and a person says yes."
+    }
+  ]
+}
