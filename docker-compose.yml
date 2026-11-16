@@ -1,0 +1,24 @@
+# The database of the local machine: one PostgreSQL server in Docker.
+# Start it with "make db-up". The values come from .env (see .env.example).
+# Docker Compose names the container and the volume after the folder of the
+# checkout, so the main checkout and each worktree have their own database.
+services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      # Reachable from this machine only.
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-todo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-sample-password-for-local-use}
+      POSTGRES_DB: ${POSTGRES_DB:-todo}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:

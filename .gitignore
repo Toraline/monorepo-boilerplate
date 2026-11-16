@@ -1,0 +1,28 @@
+# Secrets: never commit real keys. .env.example holds names only.
+.env
+.env.*
+!.env.example
+
+# Made per user, never committed (private notes, per-ticket tracking files)
+local-docs/
+
+# Tools
+node_modules/
+.venv/
+__pycache__/
+.ruff_cache/
+.DS_Store
+.claude/settings.local.json
+
+# Next.js (apps/web, apps/internal)
+.next/
+next-env.d.ts
+*.tsbuildinfo
+coverage/
+
+# Storybook (apps/ui-catalog): the built catalog
+storybook-static/
+
+# Playwright (e2e): the report of a run, and what is kept for a failed test
+playwright-report/
+test-results/

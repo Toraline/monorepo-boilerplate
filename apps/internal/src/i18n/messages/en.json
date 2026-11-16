@@ -1,0 +1,170 @@
+{
+  "metadata": {
+    "title": "Todo list admin",
+    "description": "The internal app of the sample product, for admins only."
+  },
+  "home": {
+    "title": "Todo list admin",
+    "description": "Choose an area in the menu: tags, todos or history."
+  },
+  "languageSwitch": {
+    "label": "Language"
+  },
+  "themeSwitch": {
+    "light": {
+      "label": "Theme: light",
+      "accessibleName": "Theme: light. Switch to dark."
+    },
+    "dark": {
+      "label": "Theme: dark",
+      "accessibleName": "Theme: dark. Switch to light."
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This address has no page.",
+    "backHome": "Go to the start page"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "emailRequired": "Type your email.",
+      "passwordRequired": "Type your password.",
+      "wrongCredentials": "The email or the password is not correct.",
+      "serverError": "The server did not answer. Try again."
+    },
+    "session": {
+      "checking": "Checking your login.",
+      "failed": "The server did not say whether you are logged in.",
+      "tryAgain": "Try again"
+    },
+    "userMenu": {
+      "loggedInAs": "Logged in as {name}",
+      "logout": "Log out",
+      "logoutFailed": "The logout failed. Try again."
+    },
+    "noAccess": {
+      "title": "You have no access",
+      "description": "This app is for admins only. The user {email} is not an admin.",
+      "logout": "Log out",
+      "logoutFailed": "The logout failed. Try again."
+    }
+  },
+  "menu": {
+    "label": "Areas",
+    "tags": "Tags",
+    "todos": "Todos",
+    "history": "History"
+  },
+  "tags": {
+    "title": "Tags",
+    "new": "New tag",
+    "loading": "Loading the tags.",
+    "failed": "The server did not return the tags.",
+    "tryAgain": "Try again",
+    "empty": "There are no tags yet.",
+    "table": {
+      "caption": "The tags, with the number of todos that use each one",
+      "name": "Name",
+      "color": "Color",
+      "todoCount": "Todos that use it",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "editName": "Edit: {name}",
+      "delete": "Delete",
+      "deleteName": "Delete: {name}"
+    },
+    "form": {
+      "createTitle": "New tag",
+      "editTitle": "Edit tag",
+      "nameLabel": "Name",
+      "colorLabel": "Color, in the form #RRGGBB",
+      "colorPicker": "Choose the color",
+      "nameRequired": "Type a name.",
+      "nameTooLong": "The name can have at most 50 characters.",
+      "nameExists": "A tag with this name already exists.",
+      "colorInvalid": "The color must have the form #RRGGBB, for example #1A2B3C.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "failed": "The tag was not saved. Try again."
+    },
+    "delete": {
+      "title": "Delete the tag \"{name}\"?",
+      "usage": "{count, plural, =0 {No todo uses this tag.} one {# todo uses this tag.} other {# todos use this tag.}}",
+      "warning": "The todos stay, without the tag. This cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "failed": "The tag was not deleted. Try again."
+    }
+  },
+  "todos": {
+    "title": "Todos of all users",
+    "loading": "Loading the todos.",
+    "failed": "The server did not return the todos.",
+    "tryAgain": "Try again",
+    "empty": "There are no todos yet.",
+    "emptyFilter": "No todo matches these filters.",
+    "count": "{count, plural, one {# todo} other {# todos}}",
+    "completed": "Completed",
+    "notCompleted": "Not completed",
+    "noTags": "No tags",
+    "filters": {
+      "label": "Filters of the todos",
+      "owner": "Owner",
+      "allOwners": "All owners",
+      "tag": "Tag",
+      "allTags": "All tags",
+      "completed": "Completed or not",
+      "allStates": "Completed and not completed"
+    },
+    "table": {
+      "caption": "The todos of all users. The table is read-only.",
+      "title": "Title",
+      "owner": "Owner",
+      "tags": "Tags",
+      "completed": "Completed",
+      "updatedAt": "Last change"
+    }
+  },
+  "history": {
+    "title": "History of changes",
+    "loading": "Loading the history.",
+    "failed": "The server did not return the history.",
+    "tryAgain": "Try again",
+    "empty": "There are no changes yet.",
+    "emptyFilter": "No change matches these filters.",
+    "count": "{count, plural, one {# change} other {# changes}}",
+    "kinds": {
+      "created": "Created",
+      "edited": "Edited",
+      "completed": "Completed",
+      "reopened": "Reopened",
+      "deleted": "Deleted"
+    },
+    "filters": {
+      "label": "Filters of the history",
+      "user": "User",
+      "allUsers": "All users",
+      "kind": "Kind of change",
+      "allKinds": "All kinds"
+    },
+    "table": {
+      "caption": "The changes of the todos of all users, newest first",
+      "date": "Date",
+      "user": "User",
+      "kind": "Change",
+      "todo": "Todo"
+    }
+  },
+  "pagination": {
+    "label": "Pages of the list",
+    "previous": "Previous page",
+    "next": "Next page",
+    "status": "Page {page} of {totalPages}"
+  }
+}

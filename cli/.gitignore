@@ -1,0 +1,3 @@
+# The built commands (esbuild writes them) and the packed packages.
+dist/
+*.tgz

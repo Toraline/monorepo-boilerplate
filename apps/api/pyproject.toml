@@ -1,0 +1,14 @@
+# Settings of ruff, the program that checks the code style of apps/api.
+# Run it with: make lint-api (check) and make format-api (rewrite the files).
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+# Django writes the migration files. They keep the form Django gives them.
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+# E, F: errors. I: order of the imports. B: likely bugs. UP: old syntax. DJ: Django.
+select = ["E", "F", "I", "B", "UP", "DJ"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["apps", "config"]

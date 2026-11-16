@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "title": "Lista de tarefas",
+    "description": "O aplicativo web do produto de exemplo: uma lista de tarefas."
+  },
+  "languageSwitch": {
+    "label": "Idioma"
+  },
+  "themeSwitch": {
+    "light": {
+      "label": "Tema: claro",
+      "accessibleName": "Tema: claro. Mudar para escuro."
+    },
+    "dark": {
+      "label": "Tema: escuro",
+      "accessibleName": "Tema: escuro. Mudar para claro."
+    }
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "Não existe página neste endereço.",
+    "backHome": "Ir para a página inicial"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "emailRequired": "Digite seu e-mail.",
+      "passwordRequired": "Digite sua senha.",
+      "wrongCredentials": "O e-mail ou a senha não está correto.",
+      "serverError": "O servidor não respondeu. Tente de novo."
+    },
+    "session": {
+      "checking": "Verificando seu login.",
+      "failed": "O servidor não informou se você está logado.",
+      "tryAgain": "Tentar de novo"
+    },
+    "userMenu": {
+      "loggedInAs": "Logado como {name}",
+      "logout": "Sair",
+      "logoutFailed": "Não foi possível sair. Tente de novo."
+    }
+  },
+  "todos": {
+    "title": "Suas tarefas",
+    "new": "Nova tarefa",
+    "filter": {
+      "label": "Mostrar",
+      "all": "Todas",
+      "open": "Não concluídas",
+      "completed": "Concluídas"
+    },
+    "loading": "Carregando suas tarefas.",
+    "failed": "O servidor não retornou suas tarefas.",
+    "tryAgain": "Tentar de novo",
+    "empty": "Você ainda não tem tarefas.",
+    "emptyFilter": "Nenhuma tarefa corresponde a este filtro.",
+    "completedBadge": "Concluída",
+    "actions": {
+      "complete": "Concluir",
+      "completeName": "Concluir: {title}",
+      "reopen": "Reabrir",
+      "reopenName": "Reabrir: {title}",
+      "edit": "Editar",
+      "editName": "Editar: {title}",
+      "delete": "Excluir",
+      "deleteName": "Excluir: {title}"
+    },
+    "actionFailed": "A alteração não foi salva. Tente de novo.",
+    "form": {
+      "createTitle": "Nova tarefa",
+      "editTitle": "Editar tarefa",
+      "titleLabel": "Título",
+      "descriptionLabel": "Descrição (opcional)",
+      "titleRequired": "Digite um título.",
+      "titleTooLong": "O título pode ter no máximo 200 caracteres.",
+      "descriptionTooLong": "A descrição pode ter no máximo 2000 caracteres.",
+      "titleRefused": "O servidor não aceitou este título.",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "failed": "A tarefa não foi salva. Tente de novo.",
+      "tags": {
+        "label": "Etiquetas (opcional)",
+        "loading": "Carregando as etiquetas.",
+        "failed": "O servidor não retornou as etiquetas.",
+        "empty": "Ainda não há etiquetas. Um administrador as cria."
+      }
+    },
+    "delete": {
+      "title": "Excluir esta tarefa?",
+      "message": "\"{title}\" será excluída. Isso não pode ser desfeito.",
+      "confirm": "Excluir",
+      "cancel": "Cancelar",
+      "failed": "A tarefa não foi excluída. Tente de novo."
+    },
+    "pagination": {
+      "label": "Páginas da lista",
+      "previous": "Página anterior",
+      "next": "Próxima página",
+      "status": "Página {page} de {totalPages}"
+    },
+    "tagFilter": {
+      "label": "Etiqueta",
+      "all": "Todas as etiquetas"
+    },
+    "tagsOf": "Etiquetas de {title}"
+  }
+}

@@ -1,0 +1,103 @@
+# Runs "make check", then the end-to-end tests ("make e2e"), on every pull
+# request to main.
+# It uses no repository secret: every value below is the invented sample
+# value of .env.example.
+name: Check
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    services:
+      # The same PostgreSQL image as docker-compose.yml. The tests of the server
+      # (apps/api) and the end-to-end tests use it. "make check" and "make e2e"
+      # do not start Docker here: the database already answers.
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: todo
+          POSTGRES_PASSWORD: sample-password-for-local-use
+          POSTGRES_DB: todo
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U todo -d todo"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+
+      # "cache: npm" keeps the downloaded packages between runs. The key of the
+      # cache is the content of package-lock.json.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version-file: .python-version
+          cache: pip
+          cache-dependency-path: apps/api/requirements*.txt
+
+      # The apps read the database settings from .env. The sample values are
+      # the ones the postgres service above uses (127.0.0.1, port 5432).
+      - name: Create .env from .env.example
+        run: cp .env.example .env
+
+      - name: Install the npm workspace
+        run: npm ci --no-audit --no-fund
+
+      # The two npm commands (cli/) have their own lock file. "make check"
+      # checks their code style and types, runs their tests and builds them.
+      - name: Install the packages of the two npm commands
+        run: npm ci --no-audit --no-fund
+        working-directory: cli
+
+      # Creates apps/api/.venv and installs the pinned packages of the server.
+      - name: Install the server
+        run: make install-api
+
+      # Lint, types and tests of the server, of the web apps (apps/web,
+      # apps/internal), of packages/shared and of packages/ui, then the production build of the
+      # web apps and the build of the catalog (apps/ui-catalog). The tests of the server run against the postgres service above.
+      - name: Check
+        run: make check
+
+      # The browser of the end-to-end tests (Chromium), with the system
+      # packages it needs on this machine. "make e2e" finds it and downloads
+      # nothing more.
+      - name: Install the browser of the end-to-end tests
+        run: npx playwright install --with-deps chromium
+        working-directory: e2e
+
+      # The 2 end-to-end tests (e2e/): Playwright starts the server and
+      # apps/web with a database of their own on the postgres service above,
+      # and opens the web app in the browser. The login of the tests is the
+      # first admin of .env.example: invented sample values.
+      - name: End-to-end tests
+        run: make e2e
+
+      # Kept for 7 days when a step above failed: the report of the run
+      # (open index.html) and, for each failed test, a screenshot and a
+      # recording of every step. Download it from the page of the run, under
+      # "Artifacts".
+      - name: Keep the report of the end-to-end tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-report
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          retention-days: 7
+          if-no-files-found: ignore

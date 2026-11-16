@@ -1,0 +1,170 @@
+{
+  "metadata": {
+    "title": "Administração da lista de tarefas",
+    "description": "O aplicativo interno do produto de exemplo, só para administradores."
+  },
+  "home": {
+    "title": "Administração da lista de tarefas",
+    "description": "Escolha uma área no menu: etiquetas, tarefas ou histórico."
+  },
+  "languageSwitch": {
+    "label": "Idioma"
+  },
+  "themeSwitch": {
+    "light": {
+      "label": "Tema: claro",
+      "accessibleName": "Tema: claro. Mudar para escuro."
+    },
+    "dark": {
+      "label": "Tema: escuro",
+      "accessibleName": "Tema: escuro. Mudar para claro."
+    }
+  },
+  "notFound": {
+    "title": "Página não encontrada",
+    "description": "Não existe página neste endereço.",
+    "backHome": "Ir para a página inicial"
+  },
+  "auth": {
+    "login": {
+      "title": "Entrar",
+      "email": "E-mail",
+      "password": "Senha",
+      "submit": "Entrar",
+      "emailRequired": "Digite seu e-mail.",
+      "passwordRequired": "Digite sua senha.",
+      "wrongCredentials": "O e-mail ou a senha não está correto.",
+      "serverError": "O servidor não respondeu. Tente de novo."
+    },
+    "session": {
+      "checking": "Verificando seu login.",
+      "failed": "O servidor não informou se você está logado.",
+      "tryAgain": "Tentar de novo"
+    },
+    "userMenu": {
+      "loggedInAs": "Logado como {name}",
+      "logout": "Sair",
+      "logoutFailed": "Não foi possível sair. Tente de novo."
+    },
+    "noAccess": {
+      "title": "Você não tem acesso",
+      "description": "Este aplicativo é só para administradores. O usuário {email} não é administrador.",
+      "logout": "Sair",
+      "logoutFailed": "Não foi possível sair. Tente de novo."
+    }
+  },
+  "menu": {
+    "label": "Áreas",
+    "tags": "Etiquetas",
+    "todos": "Tarefas",
+    "history": "Histórico"
+  },
+  "tags": {
+    "title": "Etiquetas",
+    "new": "Nova etiqueta",
+    "loading": "Carregando as etiquetas.",
+    "failed": "O servidor não retornou as etiquetas.",
+    "tryAgain": "Tentar de novo",
+    "empty": "Ainda não há etiquetas.",
+    "table": {
+      "caption": "As etiquetas, com o número de tarefas que usam cada uma",
+      "name": "Nome",
+      "color": "Cor",
+      "todoCount": "Tarefas que a usam",
+      "actions": "Ações"
+    },
+    "actions": {
+      "edit": "Editar",
+      "editName": "Editar: {name}",
+      "delete": "Excluir",
+      "deleteName": "Excluir: {name}"
+    },
+    "form": {
+      "createTitle": "Nova etiqueta",
+      "editTitle": "Editar etiqueta",
+      "nameLabel": "Nome",
+      "colorLabel": "Cor, no formato #RRGGBB",
+      "colorPicker": "Escolher a cor",
+      "nameRequired": "Digite um nome.",
+      "nameTooLong": "O nome pode ter no máximo 50 caracteres.",
+      "nameExists": "Já existe uma etiqueta com este nome.",
+      "colorInvalid": "A cor deve ter o formato #RRGGBB, por exemplo #1A2B3C.",
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "failed": "A etiqueta não foi salva. Tente de novo."
+    },
+    "delete": {
+      "title": "Excluir a etiqueta \"{name}\"?",
+      "usage": "{count, plural, =0 {Nenhuma tarefa usa esta etiqueta.} one {# tarefa usa esta etiqueta.} other {# tarefas usam esta etiqueta.}}",
+      "warning": "As tarefas continuam, sem a etiqueta. Isso não pode ser desfeito.",
+      "confirm": "Excluir",
+      "cancel": "Cancelar",
+      "failed": "A etiqueta não foi excluída. Tente de novo."
+    }
+  },
+  "todos": {
+    "title": "Tarefas de todos os usuários",
+    "loading": "Carregando as tarefas.",
+    "failed": "O servidor não retornou as tarefas.",
+    "tryAgain": "Tentar de novo",
+    "empty": "Ainda não há tarefas.",
+    "emptyFilter": "Nenhuma tarefa corresponde a estes filtros.",
+    "count": "{count, plural, one {# tarefa} other {# tarefas}}",
+    "completed": "Concluída",
+    "notCompleted": "Não concluída",
+    "noTags": "Sem etiquetas",
+    "filters": {
+      "label": "Filtros das tarefas",
+      "owner": "Dono",
+      "allOwners": "Todos os donos",
+      "tag": "Etiqueta",
+      "allTags": "Todas as etiquetas",
+      "completed": "Concluída ou não",
+      "allStates": "Concluídas e não concluídas"
+    },
+    "table": {
+      "caption": "As tarefas de todos os usuários. A tabela é somente leitura.",
+      "title": "Título",
+      "owner": "Dono",
+      "tags": "Etiquetas",
+      "completed": "Concluída",
+      "updatedAt": "Última alteração"
+    }
+  },
+  "history": {
+    "title": "Histórico de alterações",
+    "loading": "Carregando o histórico.",
+    "failed": "O servidor não retornou o histórico.",
+    "tryAgain": "Tentar de novo",
+    "empty": "Ainda não há alterações.",
+    "emptyFilter": "Nenhuma alteração corresponde a estes filtros.",
+    "count": "{count, plural, one {# alteração} other {# alterações}}",
+    "kinds": {
+      "created": "Criada",
+      "edited": "Editada",
+      "completed": "Concluída",
+      "reopened": "Reaberta",
+      "deleted": "Excluída"
+    },
+    "filters": {
+      "label": "Filtros do histórico",
+      "user": "Usuário",
+      "allUsers": "Todos os usuários",
+      "kind": "Tipo de alteração",
+      "allKinds": "Todos os tipos"
+    },
+    "table": {
+      "caption": "As alterações das tarefas de todos os usuários, da mais recente para a mais antiga",
+      "date": "Data",
+      "user": "Usuário",
+      "kind": "Alteração",
+      "todo": "Tarefa"
+    }
+  },
+  "pagination": {
+    "label": "Páginas da lista",
+    "previous": "Página anterior",
+    "next": "Próxima página",
+    "status": "Página {page} de {totalPages}"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "version": "0.1.0",
+  "date": "2026-11-15",
+  "coreVersion": "0.1.8",
+  "updates": [
+    {
+      "id": "0.1.0-first-release",
+      "title": "The first release: the sample todo product, the way of working with agents, and the commands create-toraline-monorepo and update-toraline-monorepo",
+      "kind": "new-feature",
+      "appliedBy": "agent",
+      "files": [],
+      "whatToDo": "Nothing. This entry describes the boilerplate at its first release. A monorepo that was created from version 0.1.0 already has it."
+    }
+  ]
+}

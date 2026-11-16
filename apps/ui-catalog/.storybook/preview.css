@@ -1,0 +1,43 @@
+/*
+ * The CSS of the catalog. The first 4 lines are the 4 lines of
+ * src/styles/globals.css of apps/web and apps/internal, in the same order, so
+ * a story looks as the component looks in an app:
+ * 1. Tailwind CSS. "source(..)" makes it look for classes in the folder of
+ *    the catalog (the stories).
+ * 2. The tokens of the library.
+ * 3. The theme of this project (packages/ui), light and dark. It also tells
+ *    Tailwind CSS to read the components of packages/ui.
+ * 4. Tells Tailwind CSS to read the components of @toraline.tech/ui.
+ */
+@import "tailwindcss" source("..");
+@import "@toraline.tech/tokens/css/tailwind.css";
+@import "@repo/ui/theme.css";
+@import "@toraline.tech/ui/tailwind.css";
+
+/*
+ * The two fonts of the library: Inter for normal text, Poppins for headings
+ * and buttons. The apps load them with next/font. The catalog has no Next.js,
+ * so it loads the font files of two npm packages. The files are built into
+ * the catalog: it needs no network.
+ */
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+@import "@fontsource/poppins/latin-400.css";
+@import "@fontsource/poppins/latin-500.css";
+@import "@fontsource/poppins/latin-600.css";
+
+/* The page of one story: the colors and the font of the current theme, as the <body> of an app. */
+body {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}
+
+/* The box around a story inside a documentation page. */
+.docs-story {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+}

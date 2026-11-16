@@ -1,0 +1,21 @@
+{
+  "name": "update-toraline-monorepo",
+  "version": "0.1.0",
+  "description": "Finds and applies the updates of the Toraline monorepo boilerplate in a monorepo that was created from it: npx update-toraline-monorepo",
+  "author": "Toraline",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Toraline/monorepo-boilerplate.git",
+    "directory": "cli/update-toraline-monorepo"
+  },
+  "type": "module",
+  "bin": {
+    "update-toraline-monorepo": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  }
+}

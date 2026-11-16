@@ -1,0 +1,110 @@
+{
+  "metadata": {
+    "title": "Todo list",
+    "description": "The web app of the sample product: a todo list."
+  },
+  "languageSwitch": {
+    "label": "Language"
+  },
+  "themeSwitch": {
+    "light": {
+      "label": "Theme: light",
+      "accessibleName": "Theme: light. Switch to dark."
+    },
+    "dark": {
+      "label": "Theme: dark",
+      "accessibleName": "Theme: dark. Switch to light."
+    }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "This address has no page.",
+    "backHome": "Go to the start page"
+  },
+  "auth": {
+    "login": {
+      "title": "Log in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Log in",
+      "emailRequired": "Type your email.",
+      "passwordRequired": "Type your password.",
+      "wrongCredentials": "The email or the password is not correct.",
+      "serverError": "The server did not answer. Try again."
+    },
+    "session": {
+      "checking": "Checking your login.",
+      "failed": "The server did not say whether you are logged in.",
+      "tryAgain": "Try again"
+    },
+    "userMenu": {
+      "loggedInAs": "Logged in as {name}",
+      "logout": "Log out",
+      "logoutFailed": "The logout failed. Try again."
+    }
+  },
+  "todos": {
+    "title": "Your todos",
+    "new": "New todo",
+    "filter": {
+      "label": "Show",
+      "all": "All",
+      "open": "Not completed",
+      "completed": "Completed"
+    },
+    "loading": "Loading your todos.",
+    "failed": "The server did not return your todos.",
+    "tryAgain": "Try again",
+    "empty": "You have no todos yet.",
+    "emptyFilter": "No todo matches this filter.",
+    "completedBadge": "Completed",
+    "actions": {
+      "complete": "Complete",
+      "completeName": "Complete: {title}",
+      "reopen": "Reopen",
+      "reopenName": "Reopen: {title}",
+      "edit": "Edit",
+      "editName": "Edit: {title}",
+      "delete": "Delete",
+      "deleteName": "Delete: {title}"
+    },
+    "actionFailed": "The change was not saved. Try again.",
+    "form": {
+      "createTitle": "New todo",
+      "editTitle": "Edit todo",
+      "titleLabel": "Title",
+      "descriptionLabel": "Description (optional)",
+      "titleRequired": "Type a title.",
+      "titleTooLong": "The title can have at most 200 characters.",
+      "descriptionTooLong": "The description can have at most 2000 characters.",
+      "titleRefused": "The server did not accept this title.",
+      "save": "Save",
+      "cancel": "Cancel",
+      "failed": "The todo was not saved. Try again.",
+      "tags": {
+        "label": "Tags (optional)",
+        "loading": "Loading the tags.",
+        "failed": "The server did not return the tags.",
+        "empty": "There are no tags yet. An admin creates them."
+      }
+    },
+    "delete": {
+      "title": "Delete this todo?",
+      "message": "\"{title}\" will be deleted. This cannot be undone.",
+      "confirm": "Delete",
+      "cancel": "Cancel",
+      "failed": "The todo was not deleted. Try again."
+    },
+    "pagination": {
+      "label": "Pages of the list",
+      "previous": "Previous page",
+      "next": "Next page",
+      "status": "Page {page} of {totalPages}"
+    },
+    "tagFilter": {
+      "label": "Tag",
+      "all": "All tags"
+    },
+    "tagsOf": "Tags of {title}"
+  }
+}

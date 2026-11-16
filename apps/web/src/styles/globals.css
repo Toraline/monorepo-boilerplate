@@ -1,0 +1,16 @@
+/*
+ * The 4 lines, in this order:
+ * 1. Tailwind CSS.
+ * 2. The tokens of the library: the CSS variables of the colors, the fonts and
+ *    the sizes, and one Tailwind class for each, for example bg-surface.
+ * 3. The theme of this project (packages/ui): its own values for the tokens,
+ *    in a light theme and a dark theme. <html data-theme> selects one.
+ * 4. Tells Tailwind CSS to read the components of @toraline.tech/ui, so it
+ *    builds the CSS of the classes they use.
+ * This file sets no color of its own: every color comes from the theme.
+ * How to change a color: docs/theme.md.
+ */
+@import "tailwindcss";
+@import "@toraline.tech/tokens/css/tailwind.css";
+@import "@repo/ui/theme.css";
+@import "@toraline.tech/ui/tailwind.css";

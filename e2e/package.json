@@ -1,0 +1,19 @@
+{
+  "name": "e2e",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The end-to-end tests: Playwright opens apps/web in a real browser, against the real server and a database of its own. Run them with: make e2e",
+  "type": "module",
+  "scripts": {
+    "e2e": "playwright test",
+    "browser": "playwright install chromium",
+    "lint": "eslint --max-warnings 0 && tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/node": "24.19.2",
+    "eslint": "9.39.4",
+    "eslint-config-next": "16.4.3",
+    "typescript": "5.9.3"
+  }
+}

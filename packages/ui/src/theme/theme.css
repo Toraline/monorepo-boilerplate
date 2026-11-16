@@ -1,0 +1,18 @@
+/*
+ * The CSS of this project's theme. Each app imports this file once, in its
+ * src/styles/globals.css, after the tokens of the library:
+ *
+ *   @import "tailwindcss";
+ *   @import "@toraline.tech/tokens/css/tailwind.css";
+ *   @import "@repo/ui/theme.css";
+ *   @import "@toraline.tech/ui/tailwind.css";
+ *
+ * The first line below loads the values of the theme. The script
+ * scripts/write-theme-css.ts writes that file from theme-config.ts.
+ *
+ * The second line tells Tailwind CSS to read the components of this package,
+ * so it builds the CSS of the classes they use. Tailwind CSS reads only the
+ * folder of the app by itself.
+ */
+@import "./theme.generated.css";
+@source "../components";

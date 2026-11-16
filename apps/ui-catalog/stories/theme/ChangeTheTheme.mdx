@@ -1,0 +1,68 @@
+import { Canvas, Meta } from "@storybook/addon-docs/blocks";
+import * as ThemeResultStories from "./ThemeResult.stories";
+
+<Meta title="Theme/Change the theme" />
+
+# Change the theme
+
+A new project that starts from this repository gets the violet theme of the sample product. This page explains how to give the project its own colors, and shows the result.
+
+Words used on this page:
+
+- **Token**: a named value of the design, stored as a CSS variable. Example: `--bg-primary` is the background of the main action, for example of a primary `Button`.
+- **Theme**: one set of values for the tokens. This project has two: `light` and `dark`.
+- **Component library**: the npm packages `@toraline.tech/ui` (the components) and `@toraline.tech/tokens` (the tokens). Every token that the project does not set keeps the value of the library.
+
+## The steps
+
+Run every command from the root folder of the repository.
+
+1. Open the file `packages/ui/src/theme/theme-config.ts`.
+2. In the theme `light`, change the values of the main color. Example, a green main color:
+
+   ```ts
+   "bg-primary": "#15803d",
+   "bg-primary-hover": "#166534",
+   ```
+
+3. In the theme `dark`, change the same two keys. Give every color a value in both themes.
+4. Change the other keys that hold the main color, in both themes: `text-brand`, `border-brand`, `border-focus`, `icon-brand`, `bg-primary-subtle`, `bg-primary-muted`, `bg-selected`.
+5. Write the CSS file of the theme again:
+
+   ```bash
+   npm run theme --workspace packages/ui
+   ```
+
+6. Two test files name the two values of the main color. Write the new values into `packages/ui/src/theme/theme-config.test.ts` and `packages/ui/src/theme/theme-css.test.ts`.
+7. Run the checks:
+
+   ```bash
+   make check
+   ```
+
+8. Look at the result. Start the catalog with `make catalog` and open this page, or start the apps with `make run`.
+
+A key of `colors` is the name of a token without the two dashes. A key that the library does not have adds a token and its class: `"bg-promo": "#b34700"` adds `--bg-promo` and the class `bg-promo`.
+
+The tests of `packages/ui` fail when the text on the main color, or the brand text on the page, has a contrast under 4.5.
+
+The full document is `docs/theme.md` in the repository. It also explains how to add a component that only the project has, and how to update the library.
+
+## The result
+
+This sample uses the tokens that the project sets. It is in the current theme of the catalog. Change the theme with the control **Theme** of the toolbar above the page: choose **Theme: dark**.
+
+<Canvas of={ThemeResultStories.Sample} sourceState="none" />
+
+The table lists every color token that `theme-config.ts` sets, with its value in each theme. It reads the file. After step 5, the new values are here.
+
+<Canvas of={ThemeResultStories.ChangedTokens} sourceState="none" />
+
+## The components of the library
+
+The catalog shows each component of the library in the theme of this project, in the group **Library** of the sidebar. It does not repeat the documentation of the library. The props of every component, the list of the tokens and the guide of the library are here:
+
+- The components: [@toraline.tech/ui on npm](https://www.npmjs.com/package/@toraline.tech/ui)
+- The tokens: [@toraline.tech/tokens on npm](https://www.npmjs.com/package/@toraline.tech/tokens)
+
+The same two documents are on your machine after `make install-js`: `node_modules/@toraline.tech/ui/README.md` and `node_modules/@toraline.tech/tokens/README.md`.

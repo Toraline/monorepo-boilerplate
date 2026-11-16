@@ -1,0 +1,28 @@
+{
+  "name": "toraline-monorepo-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The two npm commands of the boilerplate: create-toraline-monorepo and update-toraline-monorepo. Run every command through the Makefile of the repository root.",
+  "type": "module",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "*-toraline-monorepo"
+  ],
+  "scripts": {
+    "lint": "eslint --max-warnings 0 && tsc --noEmit",
+    "test": "vitest run",
+    "build": "node scripts/build.mjs",
+    "pack-check": "node scripts/check-packed.mjs"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.4",
+    "@types/node": "24.19.2",
+    "esbuild": "0.28.2",
+    "eslint": "9.39.4",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.2",
+    "vitest": "4.1.12"
+  }
+}

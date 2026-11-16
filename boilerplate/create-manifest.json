@@ -1,0 +1,416 @@
+{
+  "manifestVersion": 1,
+  "boilerplateOnly": {
+    "delete": [
+      "cli",
+      "boilerplate",
+      ".github/workflows/release.yml",
+      "docs/releasing.md",
+      "docs/repositories.md",
+      "docs/boilerplate-version.md"
+    ],
+    "replace": [
+      {
+        "file": ".github/workflows/check.yml",
+        "find": "      # The two npm commands (cli/) have their own lock file. \"make check\"\n      # checks their code style and types, runs their tests and builds them.\n      - name: Install the packages of the two npm commands\n        run: npm ci --no-audit --no-fund\n        working-directory: cli\n\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "├── cli/               the two npm commands: create-toraline-monorepo and update-toraline-monorepo\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "├── boilerplate/       the version of this boilerplate, the updates of each release, what the create command changes\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `cli/` | The code of the two npm commands. [cli/README.md](cli/README.md) has its commands and how to try a command on your machine |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `boilerplate/` | `VERSION` (the version of this boilerplate), `updates/` (one file per release) and `create-manifest.json` (what `create-toraline-monorepo` changes in a copy). [docs/boilerplate-version.md](docs/boilerplate-version.md) |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `.github/workflows/release.yml` | The workflow \"Release\", started by hand: it publishes the two commands to npm and creates the tag of the version. [docs/releasing.md](docs/releasing.md) |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "| `docs/repositories.md` | The list of the repositories that were created from this boilerplate |\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "- `cli/`: the two npm commands of the boilerplate, `create-toraline-monorepo` and `update-toraline-monorepo` (TypeScript, no dependency at run time). It has its own `package.json` and lock file and is not in the npm workspace of the root. `make lint-cli`, `make test-cli` and `make build-cli` are part of `make check`. Read [cli/README.md](cli/README.md) before changing it. `boilerplate/` holds the version of the boilerplate (`boilerplate/VERSION`), one updates file per release, and `boilerplate/create-manifest.json`: the files and lines that the create command changes in a copy. When you rename or delete a file that the manifest names, or change a line that it replaces, `make test-cli` fails and names the entry to correct. The formats: [docs/boilerplate-version.md](docs/boilerplate-version.md). A person publishes the commands ([docs/releasing.md](docs/releasing.md)); an agent never runs `npm publish` and never creates a release tag.\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "Makefile",
+        "find": "\n# The two npm commands of the boilerplate (cli/): their targets are in\n# cli/cli.mk, and \"make check\" runs them. A monorepo that was created from the\n# boilerplate has no cli/ folder; this line then includes nothing.\n-include cli/cli.mk\n",
+        "replace": "",
+        "count": 1
+      }
+    ]
+  },
+  "project": {
+    "replace": [
+      {
+        "file": "package.json",
+        "find": "\"name\": \"monorepo-boilerplate\",",
+        "replace": "\"name\": \"{{name}}\",",
+        "count": 1
+      },
+      {
+        "file": "package-lock.json",
+        "find": "\"name\": \"monorepo-boilerplate\",",
+        "replace": "\"name\": \"{{name}}\",",
+        "count": 2
+      },
+      {
+        "file": "Makefile",
+        "find": "# monorepo-boilerplate: run every command from the repository root.",
+        "replace": "# {{name}}: run every command from the repository root.",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "# monorepo-boilerplate: instructions for agents",
+        "replace": "# {{name}}: instructions for agents",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "| `ticket_prefix` | `TOR` |",
+        "replace": "| `ticket_prefix` | `{{ticketPrefix}}` |",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "# monorepo-boilerplate\n",
+        "replace": "# {{name}}\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "\nmonorepo-boilerplate/\n",
+        "replace": "\n{{name}}/\n",
+        "count": 1
+      },
+      {
+        "file": "README.md",
+        "find": "git clone git@github.com:Toraline/monorepo-boilerplate.git\ncd monorepo-boilerplate\n",
+        "replace": "git clone git@github.com:{{owner}}/{{name}}.git\ncd {{name}}\n",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "git clone git@github.com:Toraline/monorepo-boilerplate.git\n",
+        "replace": "git clone git@github.com:{{owner}}/{{name}}.git\n",
+        "count": 1
+      },
+      {
+        "file": "docs/setup-guide.md",
+        "find": "cd monorepo-boilerplate\n",
+        "replace": "cd {{name}}\n",
+        "count": 1
+      },
+      {
+        "file": ".env.example",
+        "find": "POSTGRES_USER=todo\n",
+        "replace": "POSTGRES_USER={{databaseName}}\n",
+        "count": 1
+      },
+      {
+        "file": ".env.example",
+        "find": "POSTGRES_DB=todo\n",
+        "replace": "POSTGRES_DB={{databaseName}}\n",
+        "count": 1
+      },
+      {
+        "file": "docker-compose.yml",
+        "find": "${POSTGRES_USER:-todo}",
+        "replace": "${POSTGRES_USER:-{{databaseName}}}",
+        "count": 1
+      },
+      {
+        "file": "docker-compose.yml",
+        "find": "${POSTGRES_DB:-todo}",
+        "replace": "${POSTGRES_DB:-{{databaseName}}}",
+        "count": 1
+      },
+      {
+        "file": ".github/workflows/check.yml",
+        "find": "POSTGRES_USER: todo\n",
+        "replace": "POSTGRES_USER: {{databaseName}}\n",
+        "count": 1
+      },
+      {
+        "file": ".github/workflows/check.yml",
+        "find": "POSTGRES_DB: todo\n",
+        "replace": "POSTGRES_DB: {{databaseName}}\n",
+        "count": 1
+      },
+      {
+        "file": ".github/workflows/check.yml",
+        "find": "pg_isready -U todo -d todo",
+        "replace": "pg_isready -U {{databaseName}} -d {{databaseName}}",
+        "count": 1
+      },
+      {
+        "file": "apps/internal/src/app/(admin)/page.test.tsx",
+        "find": "Todo list admin",
+        "replace": "{{name}} admin",
+        "count": 1
+      },
+      {
+        "file": "apps/internal/src/app/(admin)/page.test.tsx",
+        "find": "Administração da lista de tarefas",
+        "replace": "Administração de {{name}}",
+        "count": 1
+      }
+    ],
+    "json": [
+      {
+        "file": "apps/web/src/i18n/messages/en.json",
+        "set": {
+          "metadata.title": "{{name}}",
+          "metadata.description": "The web app of {{name}}."
+        }
+      },
+      {
+        "file": "apps/web/src/i18n/messages/pt-BR.json",
+        "set": {
+          "metadata.title": "{{name}}",
+          "metadata.description": "O aplicativo web de {{name}}."
+        }
+      },
+      {
+        "file": "apps/internal/src/i18n/messages/en.json",
+        "set": {
+          "metadata.title": "{{name}} admin",
+          "metadata.description": "The internal app of {{name}}, for admins only.",
+          "home.title": "{{name}} admin"
+        }
+      },
+      {
+        "file": "apps/internal/src/i18n/messages/pt-BR.json",
+        "set": {
+          "metadata.title": "Administração de {{name}}",
+          "metadata.description": "O aplicativo interno de {{name}}, só para administradores.",
+          "home.title": "Administração de {{name}}"
+        }
+      }
+    ]
+  },
+  "sampleProduct": {
+    "overlays": [
+      {
+        "file": "apps/web/src/app/(app)/page.tsx",
+        "from": "boilerplate/without-sample/apps/web/src/app/(app)/page.tsx",
+        "originalSha256": "67356f06698b1c19dfc88c06372cbe68e2b0daf23435734afc9aeab695a7b045"
+      },
+      {
+        "file": "apps/web/src/app/(app)/page.test.tsx",
+        "from": "boilerplate/without-sample/apps/web/src/app/(app)/page.test.tsx",
+        "originalSha256": "cacf3ff50f4fcdc539b95b688e42d3fbc3eb1f1876accd32e351d5bcc8bec599"
+      }
+    ],
+    "delete": [
+      "apps/api/apps/todos",
+      "apps/web/src/features/todos",
+      "apps/web/src/features/tags",
+      "apps/web/src/components/text-area-field.tsx",
+      "apps/internal/src/features/tags",
+      "apps/internal/src/features/todos",
+      "apps/internal/src/features/history",
+      "apps/internal/src/app/(admin)/tags",
+      "apps/internal/src/app/(admin)/todos",
+      "apps/internal/src/app/(admin)/history",
+      "packages/ui/src/components/tag-badge.tsx",
+      "packages/ui/src/components/tag-badge.test.tsx",
+      "apps/ui-catalog/stories/project/TagBadge.stories.tsx",
+      "e2e/tests/create-todo.spec.ts",
+      "docs/workflow/module-model.md"
+    ],
+    "replace": [
+      {
+        "file": "apps/api/config/settings.py",
+        "find": "    \"apps.todos\",\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "apps/api/config/settings.py",
+        "find": "# The password of the 2 sample users of \"make seed-sample\"\n# (apps/todos/management/commands/seed_sample.py). The command runs only in local mode.\nSEED_SAMPLE_PASSWORD = env_text(\"SEED_SAMPLE_PASSWORD\")\n\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "apps/api/config/urls.py",
+        "find": "from apps.todos import urls as todos_urls\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "apps/api/config/urls.py",
+        "find": "    path(\"api/\", include(\"apps.todos.urls\")),\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "apps/api/config/urls.py",
+        "find": "    path(\"api/admin/\", include(todos_urls.admin_urlpatterns)),\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "Makefile",
+        "find": "migrate seed seed-sample format-api",
+        "replace": "migrate seed format-api",
+        "count": 1
+      },
+      {
+        "file": "Makefile",
+        "find": "# Not part of \"make setup\": a person runs it when they want rows to look at.\nseed-sample: migrate ## Optional: create 2 invented sample users with tags, todos and history (SEED_SAMPLE_PASSWORD in .env); safe to run again\n\t@cd $(API_DIR) && $(API_PYTHON) manage.py seed_sample\n\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": ".env.example",
+        "find": "# The password of the 2 sample users that \"make seed-sample\" creates:\n# ana.lima@example.com and bruno.reis@example.com. Invented sample value.\n# \"make seed-sample\" is optional, and it runs only when DJANGO_DEBUG is True.\nSEED_SAMPLE_PASSWORD=sample-user-password-for-local-use\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "AGENTS.md",
+        "find": "- The module to copy the structure from when you build a new one (the todo product): [docs/workflow/module-model.md](docs/workflow/module-model.md).\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "apps/internal/src/features/auth/components/admin-menu.tsx",
+        "find": "// The three areas of the app, in the order of the menu.\nconst AREAS = [\n  { id: \"tags\", path: \"/tags\" },\n  { id: \"todos\", path: \"/todos\" },\n  { id: \"history\", path: \"/history\" },\n] as const;\n",
+        "replace": "// The areas of the app, in the order of the menu. Add your own areas to this list.\nconst AREAS = [{ id: \"home\", path: \"/\" }] as const;\n",
+        "count": 1
+      },
+      {
+        "file": "apps/internal/src/features/auth/components/require-admin.test.tsx",
+        "find": "    ).toEqual([\n      [\"Tags\", \"/tags\"],\n      [\"Todos\", \"/todos\"],\n      [\"History\", \"/history\"],\n    ]);\n    expect(screen.getByRole(\"link\", { name: \"Todos\" })).toHaveAttribute(\n      \"aria-current\",\n      \"page\",\n    );\n    expect(screen.getByRole(\"link\", { name: \"Tags\" })).not.toHaveAttribute(\n      \"aria-current\",\n    );\n",
+        "replace": "    ).toEqual([[\"Start\", \"/\"]]);\n",
+        "count": 1
+      },
+      {
+        "file": "apps/internal/src/features/auth/components/require-admin.test.tsx",
+        "find": "    expect(screen.getByRole(\"link\", { name: \"Etiquetas\" })).toBeInTheDocument();\n    expect(screen.getByRole(\"link\", { name: \"Histórico\" })).toBeInTheDocument();\n",
+        "replace": "    expect(screen.getByRole(\"link\", { name: \"Início\" })).toBeInTheDocument();\n",
+        "count": 1
+      },
+      {
+        "file": "apps/internal/src/app/(admin)/page.test.tsx",
+        "find": "Choose an area in the menu: tags, todos or history.",
+        "replace": "This app has no area yet.",
+        "count": 1
+      },
+      {
+        "file": "packages/ui/src/components/index.ts",
+        "find": "export { TagBadge, type TagBadgeProps } from \"./tag-badge\";\n",
+        "replace": "",
+        "count": 1
+      },
+      {
+        "file": "e2e/tests/support/login.ts",
+        "find": "messages.todos.title",
+        "replace": "messages.home.title",
+        "count": 1
+      },
+      {
+        "file": "e2e/tests/support/login.ts",
+        "find": "After it the page shows the todo list of the user.",
+        "replace": "After it the page shows the start page.",
+        "count": 1
+      },
+      {
+        "file": "e2e/tests/login.spec.ts",
+        "find": "  // The todo list is there, with the button that creates a todo.\n  await expect(\n    page.getByRole(\"heading\", { name: messages.todos.title }),\n  ).toBeVisible();\n  await expect(\n    page.getByRole(\"button\", { name: messages.todos.new }),\n  ).toBeVisible();\n",
+        "replace": "  // The start page is there.\n  await expect(\n    page.getByRole(\"heading\", { name: messages.home.title }),\n  ).toBeVisible();\n",
+        "count": 1
+      },
+      {
+        "file": "e2e/tests/login.spec.ts",
+        "find": "a user logs in and sees their todo list",
+        "replace": "a user logs in and sees the start page",
+        "count": 1
+      }
+    ],
+    "json": [
+      {
+        "file": "apps/web/src/i18n/messages/en.json",
+        "remove": [
+          "todos"
+        ],
+        "set": {
+          "home": {
+            "title": "Start page",
+            "description": "You are logged in. This app has no page of its own yet."
+          }
+        }
+      },
+      {
+        "file": "apps/web/src/i18n/messages/pt-BR.json",
+        "remove": [
+          "todos"
+        ],
+        "set": {
+          "home": {
+            "title": "Página inicial",
+            "description": "Você entrou. Este aplicativo ainda não tem nenhuma página própria."
+          }
+        }
+      },
+      {
+        "file": "apps/internal/src/i18n/messages/en.json",
+        "remove": [
+          "tags",
+          "todos",
+          "history",
+          "menu.tags",
+          "menu.todos",
+          "menu.history"
+        ],
+        "set": {
+          "menu.home": "Start",
+          "home.description": "This app has no area yet."
+        }
+      },
+      {
+        "file": "apps/internal/src/i18n/messages/pt-BR.json",
+        "remove": [
+          "tags",
+          "todos",
+          "history",
+          "menu.tags",
+          "menu.todos",
+          "menu.history"
+        ],
+        "set": {
+          "menu.home": "Início",
+          "home.description": "Este aplicativo ainda não tem nenhuma área."
+        }
+      }
+    ]
+  }
+}

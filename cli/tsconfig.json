@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "types": ["node"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noUncheckedIndexedAccess": true
+  },
+  "include": ["shared/**/*.ts", "create-toraline-monorepo/**/*.ts", "update-toraline-monorepo/**/*.ts", "*.ts"],
+  "exclude": ["node_modules", "**/dist"]
+}

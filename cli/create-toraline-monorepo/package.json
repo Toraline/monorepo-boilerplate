@@ -1,0 +1,21 @@
+{
+  "name": "create-toraline-monorepo",
+  "version": "0.1.0",
+  "description": "Creates a new monorepo from the Toraline monorepo boilerplate: npx create-toraline-monorepo",
+  "author": "Toraline",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Toraline/monorepo-boilerplate.git",
+    "directory": "cli/create-toraline-monorepo"
+  },
+  "type": "module",
+  "bin": {
+    "create-toraline-monorepo": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=24"
+  }
+}

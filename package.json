@@ -1,0 +1,16 @@
+{
+  "name": "monorepo-boilerplate",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Root of the npm workspace. Run every command through the Makefile.",
+  "engines": {
+    "node": ">=24"
+  },
+  "workspaces": [
+    "apps/web",
+    "apps/internal",
+    "apps/ui-catalog",
+    "packages/*",
+    "e2e"
+  ]
+}
