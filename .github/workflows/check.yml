@@ -1,11 +1,13 @@
 # Runs "make check", then the end-to-end tests ("make e2e"), on every pull
-# request to main.
+# request to main and on every push to main.
 # It uses no repository secret: every value below is the invented sample
 # value of .env.example.
 name: Check
 
 on:
   pull_request:
+    branches: [main]
+  push:
     branches: [main]
 
 permissions:

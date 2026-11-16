@@ -1,6 +1,6 @@
 ---
 name: release
-description: Prepares the release of one product of the repository - asks which product is released, checks that product's version, and leaves the release ticket and the text of the release pull request. Never publishes, tags or merges. Use when the user says "prepare the release", "what goes in this release", "release <version>" or "/release".
+description: Prepares the release of one product of the repository - asks which product is released, says its last released version, checks that product's version, and leaves the release ticket and the text of the release pull request. Never publishes, tags or merges. Use when the user says "prepare the release", "what goes in this release", "release <version>" or "/release".
 disable-model-invocation: true
 metadata:
   pack: core
@@ -9,7 +9,7 @@ metadata:
 
 # Release
 
-Prepares the release of one product. A **product** is one thing that this repository releases by itself, with its own version: an app that is deployed, one npm package, several npm packages that share one version, or a template. The skill asks which product is released, checks that product's version, and works out which pull requests and tickets are in the release and what can go wrong. It leaves one release ticket in Linear, the release pull request's title and body in a local file, and a log. A person publishes, tags and merges.
+Prepares the release of one product. A **product** is one thing that this repository releases by itself, with its own version: an app that is deployed, one npm package, several npm packages that share one version, or a template. The skill asks which product is released, says which version of it was released last, checks that product's version, and works out which pull requests and tickets are in the release and what can go wrong. It leaves one release ticket in Linear, the release pull request's title and body in a local file, and a log. A person publishes, tags and merges.
 
 ## Input
 
@@ -51,6 +51,26 @@ Three examples with invented names:
 | `library` | `packages/core/package.json`, `packages/react/package.json` | npm `@example/core`; npm `@example/react` | `npm view @example/core version`; `npm view @example/react version` | `packages/` | `CHANGELOG.md` | `.github/workflows/release.yml` |
 | `web` | `apps/web/package.json` | tag `web-v<version>`; deploy: a merge into `production` | `git tag --list 'web-v*' --sort=-v:refname` | `apps/web/`, `packages/shared/` | `none` | `none` |
 
+## The last released version, in every place
+
+The person must always see which version was released last. Two forms carry it.
+
+**The version line.** One line, printed in step 3, right after the product is chosen or found. Nothing else is printed between the product and this line.
+
+- Normal: `Product <product>: last released version <last version>, read from <source>, released on <YYYY-MM-DD>. Proposed next version: <new version>.`
+- `<source>` is what gave the version: the tag (`tag v1.2.0`), the package (`npm <package>`), or both when they agree (`tag v1.2.0 and npm <package>`).
+- The date is the date of that version at its source. For a tag: `git log -1 --format=%cs <tag>`. For a package: `npm view <package> time --json`, the value of the key that is the version. When a date cannot be read: `date not verified`.
+- The sources disagree: `Product <product>: the sources of the last released version disagree.` Then one line per source: `<source>: <version>, released on <date>`, or `<source>: no release`. Then: `The highest is <last version>. Proposed next version: <new version>. This is a blocking risk: one release is not complete.` It is the first blocking risk of step 7.
+- No release exists: `Product <product>: no release yet. Proposed first version: <new version>.`
+
+**The version pair.** Every later place that names the version of the release names the last released version with it, in round brackets:
+
+- `<new version> (last released: <last version>)`
+- `<new version> (last released: the sources disagree: <source> <version>; <source> <version>)`
+- `<new version> (no release yet)`
+
+The places: the question about the version (step 3), the draft (step 8), the description of the release ticket (step 9), the body of `release-pr.md` (step 10), the entry of `log.md` (step 11), and the final report. The title of the release ticket and the title of the pull request stay `Release <version>`: a title holds one version. In step 12, after the release, the pair is `<new version> (last released before it: <last version>)`.
+
 ## Steps
 
 1. **Choose the product.**
@@ -69,12 +89,13 @@ Three examples with invented names:
 2. **Find the last release** of the product, from the real sources. A document is not a source.
    - `git fetch origin --tags`. Then run each command of the cell "Last released version". For a tag, the version is the tag name without the fixed text of the pattern: `v1.2.0` with the pattern `v<version>` is `1.2.0`.
    - Also run `gh release list --limit 5`, and search Linear for the last release ticket of the product.
-   - When the sources give different versions, the last release is the highest one. Keep each answer: step 4 reports the difference.
-   - The commit of the last release is the tag of that version. With no tag: `npm view <package>@<version> gitHead` prints the commit of a package that was published from git. If you cannot find a last release, ask: "Which commit or tag was the last release of `<product>`?" and wait. A product that was never released has no last release: say so, and use the first commit of its paths.
-3. **Decide the version.** Use the version the person gave. Otherwise read the main version file on the branch being released (`git show origin/<branch being released>:<path>`): when its version is higher than the last release, that is the new version. Otherwise propose the next one in the pattern of the earlier versions and confirm it in step 8. If a release ticket for this product and version is already open, update it. Never create a second one. When the version the person gave is the last released version and its release ticket exists, the release already happened: go to step 12.
+   - When the sources give different versions, the last release is the highest one. Keep each answer: the version line of step 3 prints each source with its value, and step 4 reports the difference.
+   - Read the date of the last released version at each source (the section "The last released version, in every place" has the commands).
+   - The commit of the last release is the tag of that version. With no tag: `npm view <package>@<version> gitHead` prints the commit of a package that was published from git. If you cannot find a last release, ask: "Which commit or tag was the last release of `<product>`?" and wait. A product that was never released has no last release: say "no release yet" in the version line and in every version pair, and use the first commit of its paths.
+3. **Decide the version.** Use the version the person gave. Otherwise read the main version file on the branch being released (`git show origin/<branch being released>:<path>`): when its version is higher than the last release, that is the new version. Otherwise propose the next one in the pattern of the earlier versions and confirm it in step 8. Then print the version line. Do this also when the table has one product and no question was asked. When you must ask for the version, the question holds the last released version: "Which version do you release? The last released version of `<product>` is `<last version>`." With no release: "Which version do you release? `<product>` has no release yet." If a release ticket for this product and version is already open, update it. Never create a second one. When the version the person gave is the last released version and its release ticket exists, the release already happened: go to step 12.
 4. **Check the product's version.** Do the 6 checks before any later step. Read the files on the branch being released, not in the current folder: `git show origin/<branch being released>:<path>`. When the current folder is a worktree whose branch changes a version file or the changes file, also say what that branch holds: the release can start only after that branch is merged. Compare versions number by number: `0.1.10` is higher than `0.1.9`. Write for each check: the command, what it printed, and `pass`, `fail` or `not verified`.
    1. **The version written in the repository:** the value of each file of the cell "Version files".
-   2. **The last released version:** the answers of step 2. `fail` when two sources differ: one release is not complete. Name the source that is behind.
+   2. **The last released version:** the answers of step 2. `fail` when two sources differ: one release is not complete. Write each source with its value, and name the source that is behind. With no release: `pass`, with the text "no release yet".
    3. **The new version is higher** than the last released version, and is not used yet: `git ls-remote --tags origin <tag of the new version>` prints nothing, and `npm view <package>@<new version> version` prints nothing or `404`, for each tag pattern and each package of the cell "Released by".
    4. **Every version file agrees:** each file of check 1 holds the new version. Name each file that holds another value.
    5. **The changes file exists,** when the cell "Changes file" is not `none`: `git cat-file -e origin/<branch being released>:<path>` for a path with `<version>`; for a file with no `<version>` in its path, `git show origin/<branch being released>:<path> | grep -nF '<new version>'` prints a line.
@@ -97,26 +118,27 @@ Three examples with invented names:
    - behaviour a person will see change; data that must be created after the deploy;
    - the checks of the release pull request: `gh pr checks <number>`. With no release pull request, the checks of the newest commit of the branch being released: `gh run list --commit <commit>`. When that commit is the merge of a pull request and has no run of its own, the checks of that pull request: `gh pr checks <number>`. A failing or missing check is a **blocking** risk.
    Write each risk with five parts: what it is; what breaks and who notices; how to know (a command or a URL); what to do before the release; what to do if it happens. Write the rollback as ordered steps. If the documentation does not say how to roll back, write "rollback: not documented" as a blocking risk.
-8. **Show the draft and wait.** The product; the version; the 6 checks of step 4 as a table (check, result, evidence); the release pull request, or "none"; a table of tickets (id, title, status, pull request); pull requests with no ticket; pull requests left out as already released; left out: changes of other products; risks, the blocking ones first; the step a person does to release, as the release document names it, with the value of each workflow input; actions before and after the release; questions. Ask "Create the release ticket with this content?" and wait for the answer.
-9. **Create the release ticket** in Linear after the yes. Title: `Release <version>`; with more than one product in the table, `Release <product> <version>`. Description: the draft of step 8, with a checklist to verify after the release. Link every ticket of the table as related, and link the release pull request. Then create `local-docs/notes/<PREFIX>-<n>/` for the release ticket.
-10. **Write the pull request text.** Save `release-pr.md` in that folder: the title of the release ticket and the body. The body says what changes for the people who use the product, then lists the tickets and pull requests, the risks, the actions before and after the release, and the link to the release ticket. Use the profile's `output_language`.
+8. **Show the draft and wait.** The product; the version pair; the 6 checks of step 4 as a table (check, result, evidence); the release pull request, or "none"; a table of tickets (id, title, status, pull request); pull requests with no ticket; pull requests left out as already released; left out: changes of other products; risks, the blocking ones first; the step a person does to release, as the release document names it, with the value of each workflow input; actions before and after the release; questions. Ask "Create the release ticket with this content?" and wait for the answer.
+9. **Create the release ticket** in Linear after the yes. Title: `Release <version>`; with more than one product in the table, `Release <product> <version>`. Description: first the line `Version: <version pair>`, then the draft of step 8, with a checklist to verify after the release. Link every ticket of the table as related, and link the release pull request. Then create `local-docs/notes/<PREFIX>-<n>/` for the release ticket.
+10. **Write the pull request text.** Save `release-pr.md` in that folder: the title of the release ticket and the body. The body starts with the line `Version: <version pair>`. Then it says what changes for the people who use the product, then lists the tickets and pull requests, the risks, the actions before and after the release, and the link to the release ticket. Use the profile's `output_language`.
     - Do not apply it to GitHub unless the profile's `external_writes` lists editing a pull request, or the person says yes. The command is `gh pr edit <number> --title "<title>" --body-file <path>`.
-11. **Record.** Set the release ticket's status to the one that means "in review". Add an entry at the top of `log.md` in the same folder: date, product, version, last release, the result of the 6 checks, number of tickets and pull requests, blocking risks.
-12. **After the release**, when the person runs the skill again for the same product and version: run the commands of the cell "Last released version" again. Each must print the new version. Confirm the release with the checklist of the release ticket, report what you could not verify, and draft the comment "Released in <product> <version>" for each included ticket. Ask before posting the comments and before closing the release ticket.
+11. **Record.** Set the release ticket's status to the one that means "in review". Add an entry at the top of `log.md` in the same folder: date, product, the version pair, the result of the 6 checks, number of tickets and pull requests, blocking risks.
+12. **After the release**, when the person runs the skill again for the same product and version: run the commands of the cell "Last released version" again. Each must print the new version. Print one line: `Product <product>: last released version <new version>, read from <source>, released on <date>. The version before it: <last version>.` When a source still prints the earlier version, print each source with its value: the release is not complete. Confirm the release with the checklist of the release ticket, report what you could not verify, and draft the comment "Released in <product> <version>" for each included ticket. Ask before posting the comments and before closing the release ticket.
 
 ## Output
 
 A fixed report:
 
-- **Done:** the product and the version; the result of each of the 6 checks; the release ticket's link; the path of `release-pr.md`; the release pull request URL, or "none open"; totals (tickets, pull requests, pull requests with no ticket); each blocking risk in one line.
+- **Done:** the product and the version pair; the result of each of the 6 checks; the release ticket's link; the path of `release-pr.md`; the release pull request URL, or "none open"; totals (tickets, pull requests, pull requests with no ticket); each blocking risk in one line.
 - **Not done:** nothing was published, tagged or merged; whether the table "Products" was written; whether the text was applied to the pull request; tickets you could not read; checks you could not run; questions with no answer.
-- **Next step:** the one step that the person does to release, named as the release document names it: the pull request to review and merge, or the workflow to start with the value of each input. With a blocking risk: the correction comes first. Then `/release <product> <version>` again for the checks after the release.
+- **Next step:** the one step that the person does to release, named as the release document names it: the pull request to review and merge, or the workflow to start with the value of each input. It names the version pair. With a blocking risk: the correction comes first. Then `/release <product> <version>` again for the checks after the release.
 
 ## Do not
 
 - Do not merge, push, tag, publish, deploy, start a workflow, create a branch or turn on auto-merge. Name the step and let the person do it.
 - Do not name a product that is not in the table "Products", and do not release two products in one run.
 - Do not take the last released version from a document or from memory. Run the command.
+- Do not name the version of the release without the last released version: use the version pair.
 - Do not invent tickets, versions, risks or test results.
 - Do not create a second release ticket for the same product and version.
 - Do not change the status of the included tickets.

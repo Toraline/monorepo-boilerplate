@@ -23,7 +23,7 @@ With no input, the skill uses the first pair in the profile's `release_branches`
 - `agent/rules/writing.md`, `agent/rules/git-safety.md`, `agent/rules/ask-first.md`.
 - `docs/workflow/sources-of-truth.md` for where reports are saved.
 - The project's own documentation for where data migrations and feature flags live. If it does not say, ask.
-- The table "Products" of the release document (`docs/releasing.md`), when it exists. `agent/skills/release/SKILL.md` says what its columns hold.
+- The table "Products" of the release document (`docs/releasing.md`), when it exists. `agent/skills/release/SKILL.md` says what its columns hold, and its section "The last released version, in every place" says how a version is named.
 
 ## Steps
 
@@ -32,7 +32,7 @@ With no input, the skill uses the first pair in the profile's `release_branches`
 3. Check that the pair `<source> <target>` is one of the pairs in `release_branches`. If it is not, say so and ask whether to continue.
 4. Update the remote references without touching the working files: `git fetch origin`.
 5. List the commits in the release: `git log --oneline --no-merges origin/<target>..origin/<source>`. If the list is empty, report "Nothing to release." and stop.
-6. Find the pull request of each commit: `gh api repos/{owner}/{repo}/commits/<sha>/pulls`. For each pull request collect: number, title, author, merge date, changed files (`gh pr view <number> --json number,title,author,mergedAt,files,reviews,statusCheckRollup`). List commits with no pull request separately. When the table "Products" has more than one product, name the product of each pull request: each product whose cell "Paths" holds one of the changed files, or "no product". This skill does not ask which product is released: the two branches say what the release contains.
+6. Find the pull request of each commit: `gh api repos/{owner}/{repo}/commits/<sha>/pulls`. For each pull request collect: number, title, author, merge date, changed files (`gh pr view <number> --json number,title,author,mergedAt,files,reviews,statusCheckRollup`). List commits with no pull request separately. When the table "Products" has more than one product, name the product of each pull request: each product whose cell "Paths" holds one of the changed files, or "no product". This skill does not ask which product is released: the two branches say what the release contains. For each product that the release touches, run the commands of the cell "Last released version" (after `git fetch origin --tags`) and keep the answer of each one. A document is not a source. Wherever the report or the chat names a product or a version, it also names the last released version, in the words of the skill `/release`: `last released: <version>`; each source with its value when the sources disagree, which is a high-risk item of section 6; `no release yet` when no release exists.
 7. Match each pull request to a ticket: look for `<PREFIX>-<n>` in the branch name, the title or the body. Read the ticket in Linear for its status. A pull request with no ticket is listed as "no ticket".
 8. Check for conflicts without merging: `git merge-tree --write-tree origin/<target> origin/<source>`. For each conflicting file, record the last author on each side (`git log -1 --format='%an %ad' origin/<branch> -- <file>`) and what the two sides change.
 9. Give each pull request one risk level by its changed files:
@@ -48,7 +48,7 @@ With no input, the skill uses the first pair in the profile's `release_branches`
 
 The file `local-docs/notes/reports/release-prep-<source>-to-<target>-<YYYY-MM-DD>.md`, in the profile's `output_language`, in the shape that `agent/rules/writing.md` requires for a saved document. Sections, in this order:
 
-1. Pull requests in the release: number, title, ticket, author, risk, one note. With more than one product in the table "Products": also the product.
+1. Pull requests in the release: number, title, ticket, author, risk, one note. With more than one product in the table "Products": also the product. When the table "Products" exists: before the list, one line per product in the release: `Product <product>: last released version <version>, read from <source>, released on <YYYY-MM-DD>.`, or the lines for sources that disagree, or `Product <product>: no release yet.`
 2. Commits with no pull request.
 3. Conflicts: file, last author on each side, what conflicts. Or "None".
 4. New data migrations.
@@ -59,9 +59,9 @@ The file `local-docs/notes/reports/release-prep-<source>-to-<target>-<YYYY-MM-DD
 
 Then a fixed report in the chat:
 
-- **Done:** the report path, the number of pull requests, the count per risk level.
+- **Done:** the report path, the number of pull requests, the count per risk level, and the last released version of each product in the release.
 - **Not done:** what could not be read (Linear, GitHub, a branch), and why.
-- **Next step:** `/release` when the checklist has no open item; with more than one product, `/release <product>` once for each product in the release. Otherwise `/pr-status <number>` for each pull request that blocks.
+- **Next step:** `/release` when the checklist has no open item; with more than one product, `/release <product>` once for each product in the release, each named with its last released version. Otherwise `/pr-status <number>` for each pull request that blocks.
 
 ## Do not
 
@@ -69,4 +69,5 @@ Then a fixed report in the chat:
 - Do not post to GitHub, Linear or a chat. See `agent/rules/ask-first.md`.
 - Do not switch branches or change files in any checkout. See `agent/rules/git-safety.md`.
 - Do not invent a risk, an author or a ticket. Write "not verified" instead.
+- Do not take the last released version from a document or from memory. Run the command.
 - Do not hard-code branch names. They come from the input and from `release_branches`.

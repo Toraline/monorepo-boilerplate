@@ -53,11 +53,39 @@ describe("the version of the boilerplate", () => {
 });
 
 describe("the workflows of GitHub", () => {
-  const workflowsFolder = join(BOILERPLATE_ROOT, ".github", "workflows");
-  const workflows = readdirSync(workflowsFolder).map((fileName) => ({
-    fileName,
-    text: readFileSync(join(workflowsFolder, fileName), "utf8"),
-  }));
+  // The workflows of this repository, and the ones that only the public repository has.
+  const workflowFolders = [".github/workflows", "boilerplate/public/overlay/.github/workflows"];
+  const workflows = workflowFolders.flatMap((folder) =>
+    readdirSync(join(BOILERPLATE_ROOT, folder)).map((name) => ({
+      fileName: `${folder}/${name}`,
+      text: readFileSync(join(BOILERPLATE_ROOT, folder, name), "utf8"),
+    })),
+  );
+
+  /** The lines of every "run:" of a workflow: the text that a shell runs. */
+  function runLines(text: string): string[] {
+    const lines: string[] = [];
+    let blockIndentation: number | null = null;
+    for (const line of text.split("\n")) {
+      const indentation = line.length - line.trimStart().length;
+      if (blockIndentation !== null && (line.trim() === "" || indentation > blockIndentation)) {
+        lines.push(line);
+        continue;
+      }
+      blockIndentation = null;
+      const run = /^(\s*)(?:- )?run:\s*(.*)$/.exec(line);
+      if (run === null) {
+        continue;
+      }
+      const startsBlock = /^[|>][+-]?$/.test(run[2] ?? "");
+      if (startsBlock) {
+        blockIndentation = (run[1] ?? "").length;
+      } else {
+        lines.push(run[2] ?? "");
+      }
+    }
+    return lines;
+  }
 
   it("name every action by the full id of a commit, with the version in a comment", () => {
     const usesLines = workflows.flatMap((workflow) =>
@@ -76,6 +104,28 @@ describe("the workflows of GitHub", () => {
   it("each say what the token of the run may do", () => {
     for (const workflow of workflows) {
       expect(workflow.text, workflow.fileName).toMatch(/^permissions:\n(?: {2}#.*\n)* {2}contents: (read|write)\n/m);
+    }
+  });
+
+  // A value of GitHub that is written into a shell line is run as shell text. It goes through "env:".
+  it("never write a value of GitHub into the text that a shell runs", () => {
+    for (const workflow of workflows) {
+      const lines = runLines(workflow.text);
+
+      expect(lines.length, workflow.fileName).toBeGreaterThan(0);
+      expect(lines.filter((line) => line.includes("${{")), workflow.fileName).toEqual([]);
+    }
+  });
+
+  it("never run for a pull request with the secrets of the repository (pull_request_target)", () => {
+    for (const workflow of workflows) {
+      expect(workflow.text, workflow.fileName).not.toMatch(/^\s*pull_request_target\b/m);
+    }
+  });
+
+  it("give a secret only to a workflow that a pull request cannot start", () => {
+    for (const workflow of workflows.filter((candidate) => /\$\{\{\s*secrets\./.test(candidate.text))) {
+      expect(workflow.text, workflow.fileName).not.toMatch(/^ {2}pull_request\b/m);
     }
   });
 });

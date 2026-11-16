@@ -191,6 +191,21 @@ describe("createMonorepo, from this checkout as the boilerplate", () => {
     }
     expect(brokenLinks(directory)).toEqual([]);
 
+    // The workflows: only the check, and it runs for a pull request only. The workflows that
+    // release the boilerplate are not there.
+    expect(readdirSync(join(directory, ".github/workflows"))).toEqual(["check.yml"]);
+    expect(textOf(directory, ".github/workflows/check.yml")).toContain("on:\n  pull_request:\n    branches: [main]\n\npermissions:");
+    expect(textOf(directory, ".github/workflows/check.yml")).not.toContain("push");
+
+    // The script that protects the branch main on GitHub, its command, and the step that names it.
+    expect(existsSync(join(directory, "scripts/protect-main.sh"))).toBe(true);
+    expect(textOf(directory, "Makefile")).toContain("\nprotect-main: ## Protect the branch main on GitHub");
+    expect(textOf(directory, "docs/start-a-new-monorepo.md")).toContain("make protect-main");
+    const steps = nextSteps(optionsFor(directory), result, false);
+    const createStep = steps.findIndex((step) => step.includes("gh repo create"));
+    expect(createStep).toBeGreaterThan(-1);
+    expect(steps[createStep + 1]).toContain("make protect-main");
+
     // The sample product is there.
     expect(existsSync(join(directory, "apps/api/apps/todos/models.py"))).toBe(true);
     expect(brokenImports(directory)).toEqual([]);

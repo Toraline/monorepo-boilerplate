@@ -9,7 +9,7 @@ metadata:
 
 # Start
 
-The entry point. It asks the person's goal and names the one skill that fits. The first time it runs in a repository, it also asks for every profile value that is not set and writes the answers into `AGENTS.md`.
+The entry point. It asks the person's goal and names the one skill that fits. The first time it runs in a repository, it also asks for every profile value that is not set and writes the answers into `AGENTS.md`. When the repository is on GitHub and its branch `main` has no rule, it asks once whether to protect it.
 
 ## Input
 
@@ -21,6 +21,8 @@ Nothing is required. A goal or a ticket id is optional: `/start`, `/start <PREFI
 - `agent/rules/writing.md`, `agent/rules/ask-first.md`, `agent/rules/git-safety.md`.
 - `docs/workflow/working-pattern.md` (the flow), `docs/workflow/status-skills.md` (Linear status to skill), `docs/workflow/skills.md` (the catalog).
 - The folder names in `agent/skills/`.
+- `scripts/protect-main.sh`: with `--status` it says whether the repository on GitHub has a ruleset. The first lines of the script say what it creates.
+- `local-docs/notes/protect-main.md`, when it exists: the answer the person gave before.
 
 ## Steps
 
@@ -51,7 +53,20 @@ Nothing is required. A goal or a ticket id is optional: `/start`, `/start <PREFI
 6. If the person does not know an answer, leave `<ask>` in the row, record the key as not set, and go to the next key.
 7. Do not stage or commit `AGENTS.md`. Say in the report that the file changed and is not committed.
 
-### Part B. Name the skill
+### Part B. Protect the branch main (one question, only once)
+
+1. If the file `scripts/protect-main.sh` does not exist, or the file `local-docs/notes/protect-main.md` of the main checkout exists, go to Part C. The file means that the person already answered.
+2. Run `bash scripts/protect-main.sh --status`. It changes nothing. It prints one word:
+   - `protected`: the repository has a ruleset. Go to Part C.
+   - `no-github-remote`: the repository is not on GitHub yet. Go to Part C. Say in the report: "After the repository is on GitHub, run `make protect-main`."
+   - `unknown`, with a reason after it: GitHub did not answer. Go to Part C, and write the reason in the report.
+   - `not-protected`: go to step 3.
+3. Ask one question and wait: "Protect the branch main now? This creates one ruleset on GitHub: a change of `main` needs a pull request (no approval required), the check must pass, no force push, and the branch cannot be deleted."
+4. On yes: run `bash scripts/protect-main.sh --yes` and show what it printed. When it fails, show its message and change nothing else: the message says what to do (for example: the plan does not allow rulesets on a private repository).
+5. On no: change nothing on GitHub. Say: "To do it later, run `make protect-main`."
+6. Write the answer into `local-docs/notes/protect-main.md` of the main checkout, in one line: the date, `yes` or `no`, and the last line that the script printed. `local-docs/` is never committed. With this file the question is not asked again.
+
+### Part C. Name the skill
 
 1. If the message already states the goal clearly, skip the question. If not, ask one question: "What do you want to do now?" and show these options.
 
@@ -84,8 +99,8 @@ Nothing is required. A goal or a ticket id is optional: `/start`, `/start <PREFI
 
 A fixed report, written in the profile's `output_language`:
 
-- **Done:** the profile values written into `AGENTS.md` (key and value), and the skill that was named.
-- **Not done:** the profile keys still `<ask>`, and why. `AGENTS.md` is changed and not committed, if Part A wrote to it.
+- **Done:** the profile values written into `AGENTS.md` (key and value); the ruleset `protect-main`, when Part B created it; and the skill that was named.
+- **Not done:** the profile keys still `<ask>`, and why. `AGENTS.md` is changed and not committed, if Part A wrote to it. The branch `main` is not protected, when Part B found that and nothing was created: the reason, and the command `make protect-main`.
 - **Next step:** the chosen skill, by name, with the exact text to type (for example `/refine-ticket <PREFIX>-<n>`).
 
 ## Do not
@@ -94,6 +109,7 @@ A fixed report, written in the profile's `output_language`:
 - Do not choose a profile value for the person, and do not write a value they did not give.
 - Do not change any part of `AGENTS.md` other than the Value cells of the profile table.
 - Do not stage, commit or push anything.
+- Do not create the ruleset without the person's yes, do not ask about it a second time, and do not change any other setting on GitHub.
 - Do not choose the skill for the person when the goal is ambiguous. Ask.
 - Do not name a skill that is not in `agent/skills/`.
 - Do not start the chosen skill's work before the person says yes.

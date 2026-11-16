@@ -30,7 +30,7 @@ if [ ! -f AGENTS.md ]; then cp "$src/agent/templates/AGENTS.md" AGENTS.md; echo 
 cp "$src"/agent/rules/*.md agent/rules/
 cp -R "$src"/agent/templates/. agent/templates/
 cp "$src/agent/core.mk" agent/core.mk
-for s in profile.sh worktree.sh guard-main-checkout.sh check-secrets.sh init-local-docs.sh skills-catalog.sh sync-skills.sh doctor.sh; do
+for s in profile.sh worktree.sh guard-main-checkout.sh check-secrets.sh init-local-docs.sh skills-catalog.sh sync-skills.sh doctor.sh protect-main.sh; do
   cp "$src/scripts/$s" "scripts/$s"; chmod +x "scripts/$s"
 done
 cp "$src/.githooks/pre-commit" .githooks/pre-commit; chmod +x .githooks/pre-commit

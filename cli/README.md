@@ -73,4 +73,4 @@ When you add a sentence about the sample product to another document: add an ent
 
 ## Publishing
 
-A person publishes, through the GitHub workflow "Release": [docs/releasing.md](../docs/releasing.md). An agent never publishes.
+A person releases. The workflow "Release" of the development repository sends the release to the public repository as a pull request. After a person merges it, the workflow "Publish" of the public repository creates the tag and publishes the two packages: [docs/releasing.md](../docs/releasing.md). An agent never starts a release, never merges it and never publishes.

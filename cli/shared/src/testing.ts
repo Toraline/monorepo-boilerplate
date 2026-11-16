@@ -74,11 +74,17 @@ export function newRepository(label: string): string {
   return rootDirectory;
 }
 
+/** The script that makes the public copy of the boilerplate, from the root folder. */
+export const PUBLIC_COPY_SCRIPT = "boilerplate/public/make-public-copy.sh";
+
 /**
- * A git repository with the files of this checkout as they are now (also the
- * ones that are not committed yet, never the ones that git ignores), in one
- * commit with the release tag of boilerplate/VERSION. The tests use it as the
- * place to get the boilerplate from, so they need no network.
+ * A git repository with the public copy of this checkout: its files as they
+ * are now (also the ones that are not committed yet, never the ones that git
+ * ignores), without the private files and with the files that only the public
+ * repository has (boilerplate/public/), in one commit with the release tag of
+ * boilerplate/VERSION. The commands download the boilerplate from the public
+ * repository, so the tests use this as the place to get it from. They need no
+ * network.
  */
 export function templateRepositoryOfThisCheckout(): string {
   const rootDirectory = newRepository("template");
@@ -99,8 +105,9 @@ export function templateRepositoryOfThisCheckout(): string {
       cpSync(sourcePath, destinationPath);
     }
   }
+  execFileSync("bash", [join(BOILERPLATE_ROOT, PUBLIC_COPY_SCRIPT), "--apply-rules", rootDirectory], { encoding: "utf8" });
   const version = readFileSync(join(rootDirectory, "boilerplate", "VERSION"), "utf8").trim();
-  commitAll(rootDirectory, "The boilerplate of this checkout", version);
+  commitAll(rootDirectory, "The public copy of this checkout", version);
   return rootDirectory;
 }
 
