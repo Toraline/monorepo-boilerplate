@@ -14,6 +14,19 @@ The steps to release a new version of the boilerplate: publish the two packages 
 - **Workflow**: a list of steps that GitHub runs on its own machines. The release workflow is `.github/workflows/release.yml`, shown on GitHub as "Release".
 - **Repository secret**: a value saved in the settings of the repository on GitHub. A workflow can use it, and nobody can read it back.
 - **npm access token**: a password-like value, made on npmjs.com, that lets a workflow publish for an npm account.
+- **Product**: one thing that a repository releases by itself, with its own version. The skill `/release` reads the products of a repository from the table "Products" below.
+
+## Products
+
+This repository has one product. The skill `/release` reads this table and checks the version of the product before it lists what is in a release. What each column holds: the section "The table "Products"" of [agent/skills/release/SKILL.md](../agent/skills/release/SKILL.md).
+
+| Product | Version files | Released by | Last released version | Paths | Changes file | Workflow |
+|---|---|---|---|---|---|---|
+| `boilerplate` | `boilerplate/VERSION`, `cli/create-toraline-monorepo/package.json`, `cli/update-toraline-monorepo/package.json`, `cli/package-lock.json` (key `packages` > `create-toraline-monorepo` > `version`, and key `packages` > `update-toraline-monorepo` > `version`) | tag `v<version>`; npm `create-toraline-monorepo`; npm `update-toraline-monorepo` | `git tag --list 'v*' --sort=-v:refname`; `npm view create-toraline-monorepo version`; `npm view update-toraline-monorepo version` | `all` | `boilerplate/updates/<version>.json` | `.github/workflows/release.yml` |
+
+Why one product and not three: the template and the two packages cannot be released alone. The workflow "Release" takes one version, creates one tag and publishes both packages, and `make check` fails when the 3 versions differ. A published command downloads the template at the newest tag, so a package with a version that has no tag would not work.
+
+`agent/CORE_VERSION` is not a product: nothing is released under that number alone. It reaches a monorepo inside a release of the boilerplate ([boilerplate-version.md](boilerplate-version.md)).
 
 ## One-time setup
 
@@ -103,6 +116,8 @@ The rules of npm for removing a version (`npm unpublish`): https://docs.npmjs.co
 - **Done:** the workflow file, the checks of the packed files, this document. The two packages have the MIT license: `"license": "MIT"` in each `package.json`, and the file `LICENSE` in each packed package. The YAML of the workflow was parsed, and its steps were read one by one.
 - **Done:** the first release. The workflow ran on 2026-11-16 for version `0.1.0`: both packages are on npm with that version, and the tag `v0.1.0` exists.
 - **Not done:** provenance (see above).
-- **On 2026-11-16:** `0.1.0` is published. `0.1.1` is prepared in the files and is not published.
+- **Done:** the second release. The workflow ran on 2026-11-16 for version `0.1.1`: both packages are on npm with that version, and the tag `v0.1.1` exists.
+- **Done:** the table "Products", which the skill `/release` reads.
+- **On 2026-11-16:** `0.1.0` and `0.1.1` are published. `0.1.2` is prepared in the files and is not published.
 - **How to see which version is published:** `npm view create-toraline-monorepo version` prints the newest version on npm. The file `boilerplate/VERSION` on the branch `main` holds the version of the files. When the two differ, the version of the file is prepared and not published.
 - **What you must do:** for each release, steps 1 to 7. For a version that is already prepared in the files, start at step 4.

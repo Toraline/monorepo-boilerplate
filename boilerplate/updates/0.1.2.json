@@ -1,0 +1,20 @@
+{
+  "version": "0.1.2",
+  "date": "2026-11-16",
+  "coreVersion": "0.1.10",
+  "updates": [
+    {
+      "id": "0.1.2-core",
+      "title": "The core 0.1.10: the skill /release asks which product is released and checks that product's version",
+      "kind": "core-files",
+      "appliedBy": "program",
+      "files": [
+        "agent/skills/release/SKILL.md",
+        "agent/skills/release-prep/SKILL.md",
+        "agent/CORE_VERSION",
+        "docs/workflow/skills.md"
+      ],
+      "whatToDo": "Copy the 4 files from the release. When your project has skills of its own, do not copy `docs/workflow/skills.md`: run `make skills-catalog`, which writes it again. The skill `/release` now reads a table \"Products\" from `docs/releasing.md`: one row for each thing that your repository releases by itself. Your project has no such table yet. Run `/release` once: it proposes the table from your version files, package names, tags and workflows, and asks before it writes it."
+    }
+  ]
+}

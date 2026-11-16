@@ -139,6 +139,7 @@ A repository that was started from the boilerplate before the record file existe
 
 - **Done:** the version file, the updates folder with one file per version, the record file, the test that compares them.
 - **Done:** the first release, `0.1.0`, on 2026-11-16: the tag `v0.1.0` exists and both commands are on npm.
-- **On 2026-11-16:** `0.1.0` is published. `0.1.1` is prepared in the files (`boilerplate/VERSION`, `boilerplate/updates/0.1.1.json`, the 2 packages) and is not published.
+- **Done:** the second release, `0.1.1`, on 2026-11-16: the tag `v0.1.1` exists and both commands are on npm with that version.
+- **On 2026-11-16:** `0.1.0` and `0.1.1` are published. `0.1.2` is prepared in the files (`boilerplate/VERSION`, `boilerplate/updates/0.1.2.json`, the 2 packages) and is not published.
 - **Not done:** nothing that is planned for this document. A version that is in `boilerplate/VERSION` and has no tag yet is prepared and not published; this prints the published versions: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git`.
 - **What you must do:** nothing for this document. To release: [releasing.md](releasing.md).

@@ -23,6 +23,7 @@ With no input, the skill uses the first pair in the profile's `release_branches`
 - `agent/rules/writing.md`, `agent/rules/git-safety.md`, `agent/rules/ask-first.md`.
 - `docs/workflow/sources-of-truth.md` for where reports are saved.
 - The project's own documentation for where data migrations and feature flags live. If it does not say, ask.
+- The table "Products" of the release document (`docs/releasing.md`), when it exists. `agent/skills/release/SKILL.md` says what its columns hold.
 
 ## Steps
 
@@ -31,7 +32,7 @@ With no input, the skill uses the first pair in the profile's `release_branches`
 3. Check that the pair `<source> <target>` is one of the pairs in `release_branches`. If it is not, say so and ask whether to continue.
 4. Update the remote references without touching the working files: `git fetch origin`.
 5. List the commits in the release: `git log --oneline --no-merges origin/<target>..origin/<source>`. If the list is empty, report "Nothing to release." and stop.
-6. Find the pull request of each commit: `gh api repos/{owner}/{repo}/commits/<sha>/pulls`. For each pull request collect: number, title, author, merge date, changed files (`gh pr view <number> --json number,title,author,mergedAt,files,reviews,statusCheckRollup`). List commits with no pull request separately.
+6. Find the pull request of each commit: `gh api repos/{owner}/{repo}/commits/<sha>/pulls`. For each pull request collect: number, title, author, merge date, changed files (`gh pr view <number> --json number,title,author,mergedAt,files,reviews,statusCheckRollup`). List commits with no pull request separately. When the table "Products" has more than one product, name the product of each pull request: each product whose cell "Paths" holds one of the changed files, or "no product". This skill does not ask which product is released: the two branches say what the release contains.
 7. Match each pull request to a ticket: look for `<PREFIX>-<n>` in the branch name, the title or the body. Read the ticket in Linear for its status. A pull request with no ticket is listed as "no ticket".
 8. Check for conflicts without merging: `git merge-tree --write-tree origin/<target> origin/<source>`. For each conflicting file, record the last author on each side (`git log -1 --format='%an %ad' origin/<branch> -- <file>`) and what the two sides change.
 9. Give each pull request one risk level by its changed files:
@@ -47,7 +48,7 @@ With no input, the skill uses the first pair in the profile's `release_branches`
 
 The file `local-docs/notes/reports/release-prep-<source>-to-<target>-<YYYY-MM-DD>.md`, in the profile's `output_language`, in the shape that `agent/rules/writing.md` requires for a saved document. Sections, in this order:
 
-1. Pull requests in the release: number, title, ticket, author, risk, one note.
+1. Pull requests in the release: number, title, ticket, author, risk, one note. With more than one product in the table "Products": also the product.
 2. Commits with no pull request.
 3. Conflicts: file, last author on each side, what conflicts. Or "None".
 4. New data migrations.
@@ -60,7 +61,7 @@ Then a fixed report in the chat:
 
 - **Done:** the report path, the number of pull requests, the count per risk level.
 - **Not done:** what could not be read (Linear, GitHub, a branch), and why.
-- **Next step:** `/release` when the checklist has no open item. Otherwise `/pr-status <number>` for each pull request that blocks.
+- **Next step:** `/release` when the checklist has no open item; with more than one product, `/release <product>` once for each product in the release. Otherwise `/pr-status <number>` for each pull request that blocks.
 
 ## Do not
 
