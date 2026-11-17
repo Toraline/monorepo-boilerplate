@@ -1,0 +1,37 @@
+{
+  "version": "0.1.4",
+  "date": "2026-11-16",
+  "coreVersion": "0.1.11",
+  "updates": [
+    {
+      "id": "0.1.4-nextjs",
+      "title": "Next.js 16.4.5, which fixes a known security vulnerability (GHSA-mfr8-8qww-v76h)",
+      "kind": "security",
+      "appliedBy": "program",
+      "files": [
+        "apps/web/package.json",
+        "apps/internal/package.json",
+        "apps/ui-catalog/package.json",
+        "packages/shared/package.json",
+        "packages/ui/package.json",
+        "e2e/package.json",
+        "package-lock.json",
+        "apps/web/README.md",
+        "apps/internal/README.md"
+      ],
+      "whatToDo": "The problem: Next.js 16.3.0 to 16.4.4 can give a visitor cached data that was made for another value of a root param, for example for another locale or another tenant (advisory GHSA-mfr8-8qww-v76h, CVE-2026-119790, severity moderate). It happens only when one function with `'use cache'` reads a root param and is called both directly and through `unstable_cache()`. The files of the boilerplate do not do that; the code of your project can. Next.js 16.4.3 also stops the first `next build` or `next dev` that an AI agent runs, with `SecurityFatalError`. The fix is Next.js 16.4.5. The command writes `16.4.5` for `next` and for `eslint-config-next` into the 6 `package.json` files and refreshes `package-lock.json`. Then do 3 things by hand: 1. Run `make install-js`. 2. In `apps/web/README.md` and `apps/internal/README.md`, change the row `| Next.js | 16.4.3 |` to `| Next.js | 16.4.5 |`, when your project kept that table. 3. Run `npm audit`, `make check` and `make e2e`: `npm audit` no longer names `next`. When your project chose another version of `next`, the command changes no file: write a version from 16.4.5 up by hand, the same one for `next` and `eslint-config-next`, and run `make install-js`.",
+      "dependencies": [
+        { "file": "apps/web/package.json", "name": "next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "apps/web/package.json", "name": "eslint-config-next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "apps/internal/package.json", "name": "next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "apps/internal/package.json", "name": "eslint-config-next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "apps/ui-catalog/package.json", "name": "eslint-config-next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "packages/shared/package.json", "name": "next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "packages/shared/package.json", "name": "eslint-config-next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "packages/ui/package.json", "name": "next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "packages/ui/package.json", "name": "eslint-config-next", "from": "16.4.3", "to": "16.4.5" },
+        { "file": "e2e/package.json", "name": "eslint-config-next", "from": "16.4.3", "to": "16.4.5" }
+      ]
+    }
+  ]
+}

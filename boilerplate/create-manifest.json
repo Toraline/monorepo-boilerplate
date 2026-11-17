@@ -378,12 +378,12 @@
       {
         "file": "apps/web/README.md",
         "from": "boilerplate/without-sample/apps/web/README.md",
-        "originalSha256": "ff766589cf33f950b699fddd0bd63fceef3ff4b4c036775d13f4cc8b1dc1728c"
+        "originalSha256": "edee10931859b4760d0d646831078ca75dc53e2d1117ee283ad4f5e214ecc786"
       },
       {
         "file": "apps/internal/README.md",
         "from": "boilerplate/without-sample/apps/internal/README.md",
-        "originalSha256": "29942830222891b69c9c13b28bbc95bcabf9d3d06080351ca6f3cbfd3365f436"
+        "originalSha256": "a1c020de45e4e7d0ecefac00b3bc7948246af9e8c5cefc86a351b692292950cd"
       },
       {
         "file": "e2e/README.md",

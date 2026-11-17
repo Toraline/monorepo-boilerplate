@@ -24,7 +24,7 @@ Every version in `package.json` is exact. The same versions are in `apps/web`, `
 
 | What | Version |
 |---|---|
-| Next.js | 16.4.3 |
+| Next.js | 16.4.5 |
 | React | 19.2.4 |
 | Tailwind CSS | 4.3.0 |
 | `@toraline.tech/ui` and `@toraline.tech/tokens` | 0.3.1 |

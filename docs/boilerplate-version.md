@@ -141,7 +141,8 @@ A repository that was started from the boilerplate before the record file existe
 - **Done:** the first release, `0.1.0`, on 2026-11-16: both commands are on npm.
 - **Done:** the second release, `0.1.1`, on 2026-11-16: both commands are on npm with that version.
 - **Done:** the third release, `0.1.2`, on 2026-11-16: both commands are on npm with that version.
-- **Not done on 2026-11-16:** the tags `v0.1.0`, `v0.1.1` and `v0.1.2` are not in the public repository yet. They exist in the development repository and in a prepared seed. The owner pushes the seed ([releasing.md](releasing.md), "One-time setup", part A). Until then the published commands cannot download the boilerplate.
-- **On 2026-11-16:** `0.1.0`, `0.1.1` and `0.1.2` are published. `0.1.2` is the last released version. `0.1.3` is prepared in the files and not published: `boilerplate/updates/0.1.3.json` holds its 3 updates, and its core version is `0.1.11`. `boilerplate/updates/0.1.2.json` is exactly the file of the release `0.1.2`.
+- **Done:** the fourth release, `0.1.3`, on 2026-11-16: both commands are on npm with that version.
+- **Done on 2026-11-16:** the tags `v0.1.0`, `v0.1.1`, `v0.1.2` and `v0.1.3` are in the public repository. `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git` prints them.
+- **On 2026-11-16:** `0.1.0`, `0.1.1`, `0.1.2` and `0.1.3` are published. `0.1.3` is the last released version. `0.1.4` is prepared in the files and not released: `boilerplate/updates/0.1.4.json` holds its 1 update, `0.1.4-nextjs` (Next.js 16.4.5, a security fix), and its core version is `0.1.11`, the same as in `0.1.3`. `boilerplate/updates/0.1.3.json` is exactly the file of the release `0.1.3`.
 - **Not done:** nothing that is planned for this document. A version that is in `boilerplate/VERSION` and has no tag in the public repository yet is prepared and not published; this prints the released versions: `git ls-remote --tags https://github.com/Toraline/monorepo-boilerplate.git`.
 - **What you must do:** nothing for this document. To release: [releasing.md](releasing.md).
